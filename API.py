@@ -169,6 +169,21 @@ def show_one_candidate(id):
     return make_response(jsonify(data_to_return), 200)
 
 
+@app.route("/api/v1.0/voters/<id>", methods=["POST"])
+def update_password(id):
+    if "password" in request.form:
+        pw = request.form["password"]
+
+        if len(pw) < 8:
+            return make_response("Password must be at least 8 characters!", 404)
+        else:
+            query = 'UPDATE Voter SET password = ? WHERE voter_id = ?'
+            cursor.execute(query, [pw, id])
+            cursor.commit()
+
+    return make_response("Password successfully updated!", 200)
+
+
 def gov_id_generator(n):
     range_start = 10 ** (n - 1)
     range_end = (10 ** n) - 1
