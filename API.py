@@ -61,6 +61,45 @@ def register():
 
     return make_response(jsonify(cursor.commit()), 201)
 
+
+def jwt_required(func):
+    @wraps(func)
+    def jwt_required_wrapper(*args, **kwargs):
+
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+        try:
+            data = jwt.decode(token, app.secret_key)
+        except:
+            return jsonify({'message': 'Token is invalid'}), 401
+        return func(*args, **kwargs)
+
+    return jwt_required_wrapper
+
+
+@app.route("/api/v1.0/login", methods=["GET"])
+def login():
+    auth = request.authorization
+    if auth:
+        cursor.execute("SELECT * FROM Voter WHERE gov_id = ?", auth.username)
+        for user in cursor.fetchall():
+            hashed_password = bcrypt.hashpw(user[4].encode('utf8'), bcrypt.gensalt())
+            if bcrypt.checkpw(bytes(auth.password, 'UTF-8'), hashed_password):
+                token = jwt.encode(
+                    {'user': auth.username,
+                     'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+                     }, app.secret_key)
+                return make_response(jsonify({'token': token.decode('UTF-8')}), 200)
+            else:
+                return make_response(jsonify({'message': 'Bad password'}), 401)
+        else:
+            return make_response(jsonify({'message': 'Bad username'}), 401)
+
+    return make_response(jsonify({'message': 'Authentication required'}), 401)
+
 @app.route("/api/v1.0/parties", methods=["GET"])
 def show_all_parties():
     data_to_return = []
