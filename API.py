@@ -35,6 +35,8 @@ db = client.COM668_MongoDB
 blacklist = db.Blacklist
 
 email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
+
+
 @app.route("/api/v1.0/register", methods=["POST"])
 def register():
     if "first_name" in request.form \
@@ -113,6 +115,7 @@ def logout():
     blacklist.insert_one({"token": token})
     return make_response(jsonify({'message': 'Logout successful'}), 200)
 
+
 @app.route("/api/v1.0/parties", methods=["GET"])
 def show_all_parties():
     data_to_return = []
@@ -122,6 +125,10 @@ def show_all_parties():
         item_dict = {"Party ID": row[0], "Party Name": row[1]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
+
+
+def add_party():
+    return 0
 
 
 @app.route("/api/v1.0/parties/<id>", methods=["GET"])
@@ -144,6 +151,14 @@ def delete_party():
 
 
 def add_candidate():
+    return 0
+
+
+def edit_candidate():
+    return 0
+
+
+def delete_candidate():
     return 0
 
 
