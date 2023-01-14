@@ -29,6 +29,61 @@ conn = pyodbc.connect(
 
 cursor = conn.cursor()
 
+@app.route("/api/v1.0/parties", methods=["GET"])
+def show_all_parties():
+    data_to_return = []
+    query = "SELECT * FROM Party"
+    cursor.execute(query)
+    for row in cursor.fetchall():
+        item_dict = {"Party ID": row[0], "Party Name": row[1]}
+        data_to_return.append(item_dict)
+    return make_response(jsonify(data_to_return), 200)
+
+
+@app.route("/api/v1.0/parties/<id>", methods=["GET"])
+def show_one_party(id):
+    data_to_return = []
+    query = "SELECT * FROM Party WHERE party_id = ?"
+    cursor.execute(query, (id,))
+    for row in cursor.fetchall():
+        item_dict = {"Party ID": row[0], "Party Name": row[1]}
+        data_to_return.append(item_dict)
+    return make_response(jsonify(data_to_return), 200)
+
+
+def edit_party():
+    return 0
+
+
+def delete_party():
+    return 0
+
+
+def add_candidate():
+    return 0
+
+
+@app.route("/api/v1.0/candidates", methods=["GET"])
+def show_all_candidates():
+    data_to_return = []
+    query = "SELECT * FROM Candidate"
+    cursor.execute(query)
+    for row in cursor.fetchall():
+        item_dict = {"Candidate ID": row[0], "Candidate First Name": row[1], "Candidate Surname": row[2]}
+        data_to_return.append(item_dict)
+    return make_response(jsonify(data_to_return), 200)
+
+
+@app.route("/api/v1.0/candidates/<id>", methods=["GET"])
+def show_one_candidate(id):
+    data_to_return = []
+    query = "SELECT * FROM Candidate WHERE candidate_id = ?"
+    cursor.execute(query, id)
+    for row in cursor.fetchall():
+        item_dict = {"Candidate ID": row[0], "Candidate First Name": row[1], "Candidate Surname": row[2]}
+        data_to_return.append(item_dict)
+    return make_response(jsonify(data_to_return), 200)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
