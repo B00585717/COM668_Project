@@ -29,6 +29,11 @@ conn = pyodbc.connect(
 
 cursor = conn.cursor()
 
+client = MongoClient("mongodb://127.0.0.1:27017")
+db = client.COM668_MongoDB
+
+blacklist = db.Blacklist
+
 email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
 @app.route("/api/v1.0/register", methods=["POST"])
 def register():
@@ -99,6 +104,14 @@ def login():
             return make_response(jsonify({'message': 'Bad username'}), 401)
 
     return make_response(jsonify({'message': 'Authentication required'}), 401)
+
+
+@app.route("/api/v1.0/logout", methods=["GET"])
+@jwt_required
+def logout():
+    token = request.headers['x-access-token']
+    blacklist.insert_one({"token": token})
+    return make_response(jsonify({'message': 'Logout successful'}), 200)
 
 @app.route("/api/v1.0/parties", methods=["GET"])
 def show_all_parties():
