@@ -29,6 +29,38 @@ conn = pyodbc.connect(
 
 cursor = conn.cursor()
 
+email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
+@app.route("/api/v1.0/register", methods=["POST"])
+def register():
+    if "first_name" in request.form \
+            and "last_name" in request.form \
+            and "password" in request.form \
+            and "email" in request.form:
+        fn = request.form["first_name"]
+        ln = request.form["last_name"]
+        gid = gov_id_generator(8)
+        pw = request.form["password"]
+        c_id = 1
+        email = request.form["email"]
+
+        cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
+        user = cursor.fetchone()
+        if user:
+            return make_response("User already exists!", 403)
+
+        elif not re.match(email_regex, email):
+            return make_response("Invalid email address", 404)
+
+        elif not fn or not ln or not pw or not email:
+            return make_response("Please complete form", 404)
+
+        else:
+            query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
+                    "VALUES(?, ?, ?, ?, ?, ?)"
+            cursor.execute(query, [fn, ln, gid, pw, c_id, email])
+
+    return make_response(jsonify(cursor.commit()), 201)
+
 @app.route("/api/v1.0/parties", methods=["GET"])
 def show_all_parties():
     data_to_return = []
@@ -83,6 +115,12 @@ def show_one_candidate(id):
         item_dict = {"Candidate ID": row[0], "Candidate First Name": row[1], "Candidate Surname": row[2]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
+
+
+def gov_id_generator(n):
+    range_start = 10 ** (n - 1)
+    range_end = (10 ** n) - 1
+    return randint(range_start, range_end)
 
 
 if __name__ == "__main__":
