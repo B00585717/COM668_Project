@@ -1,5 +1,4 @@
 import {Component, Injectable} from '@angular/core';
-import {WebService} from "./web.service";
 
 @Component({
   selector: 'home',
