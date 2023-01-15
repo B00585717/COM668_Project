@@ -122,7 +122,7 @@ def show_all_parties():
     query = "SELECT * FROM Party"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"Party ID": row[0], "Party Name": row[1]}
+        item_dict = {"party_id": row[0], "party_name": row[1]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -137,7 +137,7 @@ def show_one_party(id):
     query = "SELECT * FROM Party WHERE party_id = ?"
     cursor.execute(query, (id,))
     for row in cursor.fetchall():
-        item_dict = {"Party ID": row[0], "Party Name": row[1]}
+        item_dict = {"party_id": row[0], "party_name": row[1]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -168,7 +168,7 @@ def show_all_candidates():
     query = "SELECT * FROM Candidate"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"Candidate ID": row[0], "Candidate First Name": row[1], "Candidate Surname": row[2]}
+        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -179,7 +179,7 @@ def show_one_candidate(id):
     query = "SELECT * FROM Candidate WHERE candidate_id = ?"
     cursor.execute(query, id)
     for row in cursor.fetchall():
-        item_dict = {"Candidate ID": row[0], "Candidate First Name": row[1], "Candidate Surname": row[2]}
+        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
