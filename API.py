@@ -150,8 +150,22 @@ def delete_party():
     return 0
 
 
+@app.route("/api/v1.0/candidates", methods=["POST"])
 def add_candidate():
-    return 0
+    if "candidate_firstname" in request.form \
+            and "candidate_lastname" in request.form \
+            and "party_id" in request.form \
+            and "constituency_id" in request.form:
+        fn = request.form["candidate_firstname"]
+        ln = request.form["candidate_lastname"]
+        p_id = request.form["party_id"]
+        c_id = request.form["constituency_id"]
+
+        query = "INSERT INTO Candidate(candidate_firstname, candidate_lastname, party_id, constituency_id) " \
+                "VALUES(?, ?, ?, ?)"
+        cursor.execute(query, [fn, ln, p_id, c_id])
+
+    return make_response(jsonify(cursor.commit()), 201)
 
 
 def edit_candidate():
