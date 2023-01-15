@@ -13,26 +13,28 @@ import {ActivatedRoute} from "@angular/router";
 export class RegisterComponent {
   registrationForm: any;
   public siteKey: any;
-  constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {}
 
-  title = 'recaptcha';
+  constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
+  }
+
   ngOnInit() {
 
     this.registrationForm = this.formBuilder.group({
-      first_name: '',
-      last_name: '',
-      email: '',
-      password: '',
+      first_name: ['', Validators.required],
+      last_name: ['', Validators.required],
+      email: ['', Validators.required],
+      password: ['', Validators.required],
       recaptcha: ['', Validators.required]
     });
     this.siteKey = "6LfJZPwjAAAAAANhjiBGN5hCBYhL4wCh4-_eFnUv"
 
   }
 
-      onSubmit() {
+  onSubmit() {
+    //console log for testing
     console.log(this.registrationForm.value);
-      this.webService.addVoter(this.registrationForm.value).subscribe((response: any) => {
-        this.registrationForm.reset();
+    this.webService.addVoter(this.registrationForm.value).subscribe((response: any) => {
+      this.registrationForm.reset();
     });
   }
 }

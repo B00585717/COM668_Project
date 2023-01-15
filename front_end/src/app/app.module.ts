@@ -25,7 +25,7 @@ var routes: any = [
   {
     path: 'login',
     component: LoginComponent
-  }
+  },
 
   ]
 
