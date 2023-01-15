@@ -9,6 +9,8 @@ import {HttpClientModule} from "@angular/common/http";
 import {WebService} from "./web.service";
 import {RegisterComponent} from './register.component';
 import {LoginComponent} from './login.component';
+import {ReactiveFormsModule} from "@angular/forms";
+import {NgxCaptchaModule} from "ngx-captcha";
 
 
 var routes: any = [
@@ -36,7 +38,9 @@ var routes: any = [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
+    ReactiveFormsModule,
+    NgxCaptchaModule
   ],
   providers: [WebService],
   bootstrap: [AppComponent]
