@@ -3,16 +3,42 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import {HomeComponent} from './home.component';
+import {RouterModule} from "@angular/router";
+import {HttpClientModule} from "@angular/common/http";
+import {WebService} from "./web.service";
+import {RegisterComponent} from './register.component';
+import {LoginComponent} from './login.component';
+
+
+var routes: any = [
+  {
+    path: '',
+    component: HomeComponent
+  },
+  {
+    path: 'register',
+    component: RegisterComponent
+  },
+  {
+    path: 'login',
+    component: LoginComponent
+  }
+
+  ]
+
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent, HomeComponent, RegisterComponent, LoginComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule,
+    RouterModule.forRoot(routes)
   ],
-  providers: [],
+  providers: [WebService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
