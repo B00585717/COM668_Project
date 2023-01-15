@@ -61,6 +61,9 @@ def register():
         elif not fn or not ln or not pw or not email:
             return make_response("Please complete form", 404)
 
+        elif len(pw) < 8:
+            return make_response("Password must be at least 8 characters!", 404)
+
         else:
             query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
                     "VALUES(?, ?, ?, ?, ?, ?)"
@@ -122,13 +125,33 @@ def show_all_parties():
     query = "SELECT * FROM Party"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"party_id": row[0], "party_name": row[1]}
+        item_dict = {"party_id": row[0], "party_name": row[1], "image": row[2], "manifesto": row[3]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
 
 def add_party():
-    return 0
+    if "party_name" in request.form \
+            and "image" in request.form \
+            and "manifesto" in request.form:
+        pn = request.form["party_name"]
+        im = request.form["image"]
+        ma = request.form["manifesto"]
+
+        cursor.execute('SELECT * FROM Party WHERE party_name = ?', (pn,))
+        party = cursor.fetchone()
+        if party:
+            return make_response("Party already exists!", 403)
+
+        elif not pn or not im or not ma:
+            return make_response("Please complete form", 404)
+
+        else:
+            query = "INSERT INTO Party(party_name, image, manifesto) " \
+                    "VALUES(?, ?, ?)"
+            cursor.execute(query, [pn, im, ma])
+
+    return make_response(jsonify(cursor.commit()), 201)
 
 
 @app.route("/api/v1.0/parties/<id>", methods=["GET"])
@@ -137,17 +160,63 @@ def show_one_party(id):
     query = "SELECT * FROM Party WHERE party_id = ?"
     cursor.execute(query, (id,))
     for row in cursor.fetchall():
-        item_dict = {"party_id": row[0], "party_name": row[1]}
+        item_dict = {"party_id": row[0], "party_name": row[1], "image": row[2], "manifesto": row[3]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
 
-def edit_party():
-    return 0
+@app.route("/api/v1.0/parties/<id>", methods=["PUT"])
+def edit_party(id):
+    if "party_name" in request.form \
+            and "image" in request.form \
+            and "manifesto" in request.form:
+        pn = request.form["party_name"]
+        im = request.form["image"]
+        ma = request.form["manifesto"]
+
+        cursor.execute('SELECT * FROM Party WHERE party_name = ?', (pn,))
+        party = cursor.fetchone()
+        if party:
+            return make_response("Party already exists!", 403)
+
+        elif not pn or not im or not ma:
+            return make_response("Please complete form", 404)
+
+        else:
+            query = 'UPDATE Party ' \
+                    'SET party_name, image, manifesto = ?, ?, ? ' \
+                    'WHERE party_id = ?'
+            cursor.execute(query, [pn, im, ma, id])
+            cursor.commit()
+
+    return make_response(jsonify(cursor.commit()), 201)
 
 
 def delete_party():
     return 0
+
+
+@app.route("/api/v1.0/candidates/<id>", methods=["PUT"])
+def edit_candidate(id):
+    if "candidate_firstname" in request.form \
+            and "candidate_lastname" in request.form \
+            and "party_id" in request.form \
+            and "image" in request.form \
+            and "constituency_id" in request.form \
+            and "statement" in request.form:
+        fn = request.form["candidate_firstname"]
+        ln = request.form["candidate_lastname"]
+        p_id = request.form["party_id"]
+        im = request.form["image"]
+        c_id = request.form["constituency_id"]
+        rq = request.form["request"]
+
+        query = 'UPDATE Candidate ' \
+                'SET candidate_firstname, candidate_lastname, party_id, image, constituency_id, statement = ?, ?, ?, ?, ?, ?' \
+                'WHERE candidate_id = ?'
+        cursor.execute(query, [fn, ln, p_id, im, c_id, rq, id])
+
+    return make_response(jsonify(cursor.commit()), 201)
 
 
 @app.route("/api/v1.0/candidates", methods=["POST"])
@@ -155,21 +224,21 @@ def add_candidate():
     if "candidate_firstname" in request.form \
             and "candidate_lastname" in request.form \
             and "party_id" in request.form \
-            and "constituency_id" in request.form:
+            and "image" in request.form \
+            and "constituency_id" in request.form \
+            and "statement" in request.form:
         fn = request.form["candidate_firstname"]
         ln = request.form["candidate_lastname"]
         p_id = request.form["party_id"]
+        im = request.form["image"]
         c_id = request.form["constituency_id"]
+        rq = request.form["request"]
 
-        query = "INSERT INTO Candidate(candidate_firstname, candidate_lastname, party_id, constituency_id) " \
-                "VALUES(?, ?, ?, ?)"
-        cursor.execute(query, [fn, ln, p_id, c_id])
+        query = "INSERT INTO Candidate(candidate_firstname, candidate_lastname, party_id, image, constituency_id, statement) " \
+                "VALUES(?, ?, ?, ?, ?, ?)"
+        cursor.execute(query, [fn, ln, p_id, im, c_id, rq])
 
     return make_response(jsonify(cursor.commit()), 201)
-
-
-def edit_candidate():
-    return 0
 
 
 def delete_candidate():
