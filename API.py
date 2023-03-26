@@ -1,38 +1,21 @@
-import datetime
 import re
 from datetime import timedelta
 from random import randint
-
-import bcrypt
-from functools import wraps
-import jwt
-import pyodbc
 from decouple import config
-from flask import Flask, request, jsonify, make_response, json
-from pymongo import MongoClient
-
+from flask import Flask, request, jsonify, make_response, json, session
+from flask_jwt_extended import JWTManager
+from DBConfig import DBConfig
 from flask_cors import CORS
+
 
 app = Flask(__name__)
 app.secret_key = config('SK')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
 CORS(app)
 
-server = 'b00585717server.database.windows.net'
-database = 'b00585717db'
-username = config('UN', default='')
-password = config('PW', default='')
-driver = '{ODBC Driver 18 for SQL Server}'
-
-conn = pyodbc.connect(
-    'DRIVER=' + driver + ';SERVER=tcp:' + server + ';PORT=1433;DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
-
-cursor = conn.cursor()
-
-client = MongoClient("mongodb://127.0.0.1:27017")
-db = client.COM668_MongoDB
-
-blacklist = db.Blacklist
+jwt = JWTManager(app)
+SQLdb = DBConfig()
+cursor = SQLdb.get_cursor()
 
 email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
 
@@ -68,55 +51,54 @@ def register():
             query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
                     "VALUES(?, ?, ?, ?, ?, ?)"
             cursor.execute(query, [fn, ln, gid, pw, c_id, email])
+            cursor.commit()
 
-    return make_response(jsonify(cursor.commit()), 201)
-
-
-def jwt_required(func):
-    @wraps(func)
-    def jwt_required_wrapper(*args, **kwargs):
-
-        token = None
-        if 'x-access-token' in request.headers:
-            token = request.headers['x-access-token']
-        if not token:
-            return jsonify({'message': 'Token is missing'}), 401
-        try:
-            data = jwt.decode(token, app.secret_key)
-        except:
-            return jsonify({'message': 'Token is invalid'}), 401
-        return func(*args, **kwargs)
-
-    return jwt_required_wrapper
+    return make_response(jsonify('Success'), 201)
 
 
-@app.route("/api/v1.0/login", methods=["GET"])
+@app.route("/api/v1.0/login", methods=["POST"])
 def login():
-    auth = request.authorization
-    if auth:
-        cursor.execute("SELECT * FROM Voter WHERE gov_id = ?", auth.username)
-        for user in cursor.fetchall():
-            hashed_password = bcrypt.hashpw(user[4].encode('utf8'), bcrypt.gensalt())
-            if bcrypt.checkpw(bytes(auth.password, 'UTF-8'), hashed_password):
-                token = jwt.encode(
-                    {'user': auth.username,
-                     'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-                     }, app.secret_key)
-                return make_response(jsonify({'token': token.decode('UTF-8')}), 200)
-            else:
-                return make_response(jsonify({'message': 'Bad password'}), 401)
-        else:
-            return make_response(jsonify({'message': 'Bad username'}), 401)
+    # Get the gov_id and password from the request
+    gov_id = request.form.get('gov_id')
+    password = request.form.get('password')
 
-    return make_response(jsonify({'message': 'Authentication required'}), 401)
+    # Query the Azure SQL Database to check if the gov_id and password are correct
+    cursor.execute(f"SELECT * FROM Voter WHERE gov_id='{gov_id}' AND password='{password}'")
+    user = cursor.fetchone()
+
+    # Check if the user was found in the database
+    if user:
+        # Store the user ID in the session
+        session['user_id'] = user[0]
+
+        # Return a success message
+        return jsonify({'Success!': 200})
+    else:
+        # Return an error message
+        return jsonify({'message': 'Invalid gov_id or password.'}), 401
+
+@app.route('/profile')
+def profile():
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        # Redirect to the login page if the user is not logged in
+        return jsonify({'message': 'You must log in to view this page.'}), 401
+
+    # Query the Azure SQL Database to get the user's profile information
+    cursor.execute(f"SELECT * FROM Voter WHERE voter_id='{session['user_id']}'")
+    user = cursor.fetchone()
+
+    # Return the user's profile information
+    return jsonify({'first name': user[1], 'last name': user[2]})
 
 
-@app.route("/api/v1.0/logout", methods=["GET"])
-@jwt_required
+@app.route('/logout')
 def logout():
-    token = request.headers['x-access-token']
-    blacklist.insert_one({"token": token})
-    return make_response(jsonify({'message': 'Logout successful'}), 200)
+    # Clear the user ID from the session
+    session.pop('user_id', None)
+
+    # Return a success message
+    return jsonify({'message': 'Logout successful!'})
 
 
 @app.route("/api/v1.0/parties", methods=["GET"])
@@ -129,7 +111,7 @@ def show_all_parties():
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
-
+@app.route("/api/v1.0/parties", methods=["POST"])
 def add_party():
     if "party_name" in request.form \
             and "image" in request.form \
@@ -232,11 +214,11 @@ def add_candidate():
         p_id = request.form["party_id"]
         im = request.form["image"]
         c_id = request.form["constituency_id"]
-        rq = request.form["request"]
+        st = request.form["statement"]
 
         query = "INSERT INTO Candidate(candidate_firstname, candidate_lastname, party_id, image, constituency_id, statement) " \
                 "VALUES(?, ?, ?, ?, ?, ?)"
-        cursor.execute(query, [fn, ln, p_id, im, c_id, rq])
+        cursor.execute(query, [fn, ln, p_id, im, c_id, st])
 
     return make_response(jsonify(cursor.commit()), 201)
 
@@ -251,7 +233,17 @@ def show_all_candidates():
     query = "SELECT * FROM Candidate"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2]}
+        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2], "party_id": row[3], "image": row[5], "statement": row[7]}
+        data_to_return.append(item_dict)
+    return make_response(jsonify(data_to_return), 200)
+
+@app.route("/api/v1.0/voters", methods=["GET"])
+def show_all_voters():
+    data_to_return = []
+    query = "SELECT * FROM Voter"
+    cursor.execute(query)
+    for row in cursor.fetchall():
+        item_dict = {"voter_id": row[0], "first_name": row[1], "last_name": row[2], "gov_id": row[3], "password": row[4], "email": row[6]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -262,12 +254,12 @@ def show_one_candidate(id):
     query = "SELECT * FROM Candidate WHERE candidate_id = ?"
     cursor.execute(query, id)
     for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2]}
+        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2], "party_id": row[3], "image": row[5], "statement": row[7]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
 
-@app.route("/api/v1.0/voters/<id>", methods=["POST"])
+@app.route("/api/v1.0/voters/<id>", methods=["PUT"])
 def update_password(id):
     if "password" in request.form:
         pw = request.form["password"]
