@@ -1,3 +1,4 @@
+import random
 import re
 from datetime import timedelta
 from random import randint
@@ -5,8 +6,8 @@ from decouple import config
 from flask import Flask, request, jsonify, make_response, json, session
 from flask_jwt_extended import JWTManager
 from DBConfig import DBConfig
+import GoogleAPI
 from flask_cors import CORS
-
 
 app = Flask(__name__)
 app.secret_key = config('SK')
@@ -17,6 +18,7 @@ jwt = JWTManager(app)
 SQLdb = DBConfig()
 cursor = SQLdb.get_cursor()
 
+# Regular expression for a properly constructed email address
 email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
 
 
@@ -30,8 +32,15 @@ def register():
         ln = request.form["last_name"]
         gid = gov_id_generator(8)
         pw = request.form["password"]
+        # TODO: Constituency ID is hardcoded to 1 atm, plan to use maps API to auto generate based on location
         c_id = 1
         email = request.form["email"]
+
+        # Generate a random 6-digit OTP
+        otp = str(random.randint(100000, 999999))
+
+        # Use GoogleAPI to send email containing otp
+        GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
 
         cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
         user = cursor.fetchone()
@@ -48,12 +57,15 @@ def register():
             return make_response("Password must be at least 8 characters!", 404)
 
         else:
-            query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
-                    "VALUES(?, ?, ?, ?, ?, ?)"
-            cursor.execute(query, [fn, ln, gid, pw, c_id, email])
-            cursor.commit()
-
-    return make_response(jsonify('Success'), 201)
+            # TODO: Current implementation of 2fa uses input from console to authenticate otp, will change later
+            if input("Enter the OTP sent to your email: ") == otp:
+                query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
+                        "VALUES(?, ?, ?, ?, ?, ?)"
+                cursor.execute(query, [fn, ln, gid, pw, c_id, email])
+                cursor.commit()
+                return make_response(jsonify('Success'), 201)
+            else:
+                return 'Invalid OTP'
 
 
 @app.route("/api/v1.0/login", methods=["POST"])
@@ -76,6 +88,7 @@ def login():
     else:
         # Return an error message
         return jsonify({'message': 'Invalid gov_id or password.'}), 401
+
 
 @app.route('/profile')
 def profile():
@@ -110,6 +123,7 @@ def show_all_parties():
         item_dict = {"party_id": row[0], "party_name": row[1], "image": row[2], "manifesto": row[3]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
+
 
 @app.route("/api/v1.0/parties", methods=["POST"])
 def add_party():
@@ -233,9 +247,11 @@ def show_all_candidates():
     query = "SELECT * FROM Candidate"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2], "party_id": row[3], "image": row[5], "statement": row[7]}
+        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
+                     "party_id": row[3], "image": row[5], "statement": row[7]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
+
 
 @app.route("/api/v1.0/voters", methods=["GET"])
 def show_all_voters():
@@ -243,7 +259,8 @@ def show_all_voters():
     query = "SELECT * FROM Voter"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"voter_id": row[0], "first_name": row[1], "last_name": row[2], "gov_id": row[3], "password": row[4], "email": row[6]}
+        item_dict = {"voter_id": row[0], "first_name": row[1], "last_name": row[2], "gov_id": row[3],
+                     "password": row[4], "email": row[6]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -254,7 +271,8 @@ def show_one_candidate(id):
     query = "SELECT * FROM Candidate WHERE candidate_id = ?"
     cursor.execute(query, id)
     for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2], "party_id": row[3], "image": row[5], "statement": row[7]}
+        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
+                     "party_id": row[3], "image": row[5], "statement": row[7]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
