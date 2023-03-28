@@ -21,7 +21,8 @@ cursor = SQLdb.get_cursor()
 
 # Constants
 GOV_ID_LENGTH = 8
-OTP_LENGTH = range(100000, 999999)
+OTP_RANGE_MIN = 100000
+OTP_RANGE_MAX = 999999
 PASSWORD_LENGTH = 8
 
 
@@ -50,7 +51,7 @@ def register():
         hashed_pw = bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt())
 
         # Generate a random 6-digit OTP
-        otp = str(random.randint(OTP_LENGTH))
+        otp = str(random.randint(OTP_RANGE_MIN, OTP_RANGE_MAX))
 
         cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
         user = cursor.fetchone()
@@ -82,9 +83,9 @@ def register():
                         "VALUES(?, ?, ?, ?, ?, ?)"
                 cursor.execute(query, [fn, ln, gid, hashed_pw, c_id, email])
                 cursor.commit()
-                return make_response(jsonify('Success'), 201)
+                return make_response('Success', 201)
             else:
-                return 'Invalid OTP'
+                return make_response('Invalid OTP', 404)
 
 
 @app.route("/api/v1.0/login", methods=["POST"])
