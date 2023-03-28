@@ -43,7 +43,10 @@ def register():
         otp = str(random.randint(100000, 999999))
 
         # Use GoogleAPI to send email containing otp
-        GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
+        email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
+
+        if not email_sent:
+            return make_response("Failed to send email", 500)
 
         cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
         user = cursor.fetchone()
