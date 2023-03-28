@@ -1,12 +1,13 @@
 import random
 import re
+import GoogleAPI
+import bcrypt
 from datetime import timedelta
 from random import randint
 from decouple import config
 from flask import Flask, request, jsonify, make_response, json, session
 from flask_jwt_extended import JWTManager
 from DBConfig import DBConfig
-import GoogleAPI
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -17,6 +18,12 @@ CORS(app)
 jwt = JWTManager(app)
 SQLdb = DBConfig()
 cursor = SQLdb.get_cursor()
+
+# Constants
+GOV_ID_LENGTH = 8
+OTP_LENGTH = range(100000, 999999)
+PASSWORD_LENGTH = 8
+
 
 # Regular expression for a properly constructed email address
 email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
@@ -34,19 +41,16 @@ def register():
             and "email" in request.form:
         fn = request.form["first_name"]
         ln = request.form["last_name"]
-        gid = gov_id_generator(8)
+        gid = gov_id_generator(GOV_ID_LENGTH)
         pw = request.form["password"]
         postcode = request.form["postcode"]
         email = request.form["email"]
 
+        # Password is hashed before it is inserted into database
+        hashed_pw = bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt())
+
         # Generate a random 6-digit OTP
-        otp = str(random.randint(100000, 999999))
-
-        # Use GoogleAPI to send email containing otp
-        email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
-
-        if not email_sent:
-            return make_response("Failed to send email", 500)
+        otp = str(random.randint(OTP_LENGTH))
 
         cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
         user = cursor.fetchone()
@@ -59,18 +63,24 @@ def register():
         elif not re.search(postcode_regex, postcode).group(0):
             return make_response('Invalid Postcode', 404)
 
-        elif len(pw) < 8:
+        elif len(pw) < PASSWORD_LENGTH:
             return make_response("Password must be at least 8 characters!", 404)
 
         else:
+            # Use GoogleAPI to send email containing otp
+            email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
+
+            if not email_sent:
+                return make_response("Failed to send email", 500)
+
             postcode = re.search(postcode_regex, postcode).group(0)
-            c_id = matchPostcodeWithConstituency(postcode)
+            c_id = match_postcode_with_constituency(postcode)
 
             # TODO: Current implementation of 2fa uses input from console to authenticate otp, will change later
             if input("Enter the OTP sent to your email: ") == otp:
                 query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
                         "VALUES(?, ?, ?, ?, ?, ?)"
-                cursor.execute(query, [fn, ln, gid, pw, c_id, email])
+                cursor.execute(query, [fn, ln, gid, hashed_pw, c_id, email])
                 cursor.commit()
                 return make_response(jsonify('Success'), 201)
             else:
@@ -79,24 +89,26 @@ def register():
 
 @app.route("/api/v1.0/login", methods=["POST"])
 def login():
-    # Get the gov_id and password from the request
-    gov_id = request.form.get('gov_id')
-    password = request.form.get('password')
+    gov_id = request.form['gov_id']
+    password = request.form['password']
 
     # Query the Azure SQL Database to check if the gov_id and password are correct
-    cursor.execute(f"SELECT * FROM Voter WHERE gov_id='{gov_id}' AND password='{password}'")
+    cursor.execute(f"SELECT * FROM Voter WHERE gov_id='{gov_id}'")
     user = cursor.fetchone()
 
     # Check if the user was found in the database
     if user:
-        # Store the user ID in the session
-        session['user_id'] = user[0]
-
-        # Return a success message
-        return jsonify({'Success!': 200})
+        hashed_password = user[4]
+        if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+            # Store the user ID in the session
+            session['user_id'] = user[0]
+            # Return a success message
+            return jsonify({'Success!': 200})
+        else:
+            return jsonify({'message': 'Incorrect password.'}), 401
     else:
         # Return an error message
-        return jsonify({'message': 'Invalid gov_id or password.'}), 401
+        return jsonify({'message': 'User not found.'}), 404
 
 
 @app.route('/profile')
@@ -308,7 +320,7 @@ def gov_id_generator(n):
     return randint(range_start, range_end)
 
 
-def matchPostcodeWithConstituency(postcode):
+def match_postcode_with_constituency(postcode):
     # Load the JSON dictionary from a file
     with open('constituencies.json', 'r') as f:
         my_dictionary = json.load(f)
