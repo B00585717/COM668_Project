@@ -21,19 +21,22 @@ cursor = SQLdb.get_cursor()
 # Regular expression for a properly constructed email address
 email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
 
+# Regular expression that takes the first part of postcode
+postcode_regex = r'^[A-Z0-9]{3}([A-Z0-9](?=\s*[A-Z0-9]{3}|$))?'
+
 
 @app.route("/api/v1.0/register", methods=["POST"])
 def register():
     if "first_name" in request.form \
             and "last_name" in request.form \
             and "password" in request.form \
+            and "postcode" in request.form \
             and "email" in request.form:
         fn = request.form["first_name"]
         ln = request.form["last_name"]
         gid = gov_id_generator(8)
         pw = request.form["password"]
-        # TODO: Constituency ID is hardcoded to 1 atm, plan to use maps API to auto generate based on location
-        c_id = 1
+        postcode = request.form["postcode"]
         email = request.form["email"]
 
         # Generate a random 6-digit OTP
@@ -50,13 +53,16 @@ def register():
         elif not re.match(email_regex, email):
             return make_response("Invalid email address", 404)
 
-        elif not fn or not ln or not pw or not email:
-            return make_response("Please complete form", 404)
+        elif not re.search(postcode_regex, postcode).group(0):
+            return make_response('Invalid Postcode', 404)
 
         elif len(pw) < 8:
             return make_response("Password must be at least 8 characters!", 404)
 
         else:
+            postcode = re.search(postcode_regex, postcode).group(0)
+            c_id = matchPostcodeWithConstituency(postcode)
+
             # TODO: Current implementation of 2fa uses input from console to authenticate otp, will change later
             if input("Enter the OTP sent to your email: ") == otp:
                 query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
@@ -292,10 +298,23 @@ def update_password(id):
     return make_response("Password successfully updated!", 200)
 
 
+########## HELPER FUNCTIONS ##########
 def gov_id_generator(n):
     range_start = 10 ** (n - 1)
     range_end = (10 ** n) - 1
     return randint(range_start, range_end)
+
+
+def matchPostcodeWithConstituency(postcode):
+    # Load the JSON dictionary from a file
+    with open('constituencies.json', 'r') as f:
+        my_dictionary = json.load(f)
+
+    # Look up the value in the dictionary
+    if postcode in my_dictionary:
+        return my_dictionary[postcode]
+    else:
+        return None
 
 
 if __name__ == "__main__":
