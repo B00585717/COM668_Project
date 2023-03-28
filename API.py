@@ -20,10 +20,10 @@ SQLdb = DBConfig()
 cursor = SQLdb.get_cursor()
 
 # Constants
-GOV_ID_LENGTH = 8
-OTP_RANGE_MIN = 100000
-OTP_RANGE_MAX = 999999
-PASSWORD_LENGTH = 8
+GOV_ID_LENGTH = config('GID_LENGTH')
+OTP_RANGE_MIN = config('OTP_MIN')
+OTP_RANGE_MAX = config('OTP_MAX')
+PASSWORD_LENGTH = config('PW_LENGTH')
 
 
 # Regular expression for a properly constructed email address
@@ -35,57 +35,61 @@ postcode_regex = r'^[A-Z0-9]{3}([A-Z0-9](?=\s*[A-Z0-9]{3}|$))?'
 
 @app.route("/api/v1.0/register", methods=["POST"])
 def register():
-    if "first_name" in request.form \
-            and "last_name" in request.form \
-            and "password" in request.form \
-            and "postcode" in request.form \
-            and "email" in request.form:
-        fn = request.form["first_name"]
-        ln = request.form["last_name"]
-        gid = gov_id_generator(GOV_ID_LENGTH)
-        pw = request.form["password"]
-        postcode = request.form["postcode"]
-        email = request.form["email"]
+    try:
+        if "first_name" in request.form \
+                and "last_name" in request.form \
+                and "password" in request.form \
+                and "postcode" in request.form \
+                and "email" in request.form:
+            fn = request.form["first_name"]
+            ln = request.form["last_name"]
+            gid = gov_id_generator(GOV_ID_LENGTH)
+            pw = request.form["password"]
+            postcode = request.form["postcode"]
+            email = request.form["email"]
 
-        # Password is hashed before it is inserted into database
-        hashed_pw = bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt())
+            # Password is hashed before it is inserted into database
+            hashed_pw = bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt())
 
-        # Generate a random 6-digit OTP
-        otp = str(random.randint(OTP_RANGE_MIN, OTP_RANGE_MAX))
+            # Generate a random 6-digit OTP
+            otp = generate_otp()
 
-        cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
-        user = cursor.fetchone()
-        if user:
-            return make_response("User already exists!", 403)
+            cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
+            user = cursor.fetchone()
+            if user:
+                return make_response("User already exists!", 403)
 
-        elif not re.match(email_regex, email):
-            return make_response("Invalid email address", 404)
+            elif not re.match(email_regex, email):
+                return make_response("Invalid email address", 404)
 
-        elif not re.search(postcode_regex, postcode).group(0):
-            return make_response('Invalid Postcode', 404)
+            elif not re.search(postcode_regex, postcode).group(0):
+                return make_response('Invalid Postcode', 404)
 
-        elif len(pw) < PASSWORD_LENGTH:
-            return make_response("Password must be at least 8 characters!", 404)
+            elif len(pw) < PASSWORD_LENGTH:
+                return make_response("Password must be at least 8 characters!", 404)
 
-        else:
-            # Use GoogleAPI to send email containing otp
-            email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
-
-            if not email_sent:
-                return make_response("Failed to send email", 500)
-
-            postcode = re.search(postcode_regex, postcode).group(0)
-            c_id = match_postcode_with_constituency(postcode)
-
-            # TODO: Current implementation of 2fa uses input from console to authenticate otp, will change later
-            if input("Enter the OTP sent to your email: ") == otp:
-                query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
-                        "VALUES(?, ?, ?, ?, ?, ?)"
-                cursor.execute(query, [fn, ln, gid, hashed_pw, c_id, email])
-                cursor.commit()
-                return make_response('Success', 201)
             else:
-                return make_response('Invalid OTP', 404)
+                # Use GoogleAPI to send email containing otp
+                email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
+
+                if not email_sent:
+                    return make_response("Failed to send email", 500)
+
+                postcode = re.search(postcode_regex, postcode).group(0)
+                c_id = match_postcode_with_constituency(postcode)
+
+                # TODO: Current implementation of 2fa uses input from console to authenticate otp, will change later
+                if input("Enter the OTP sent to your email: ") == otp:
+                    query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
+                            "VALUES(?, ?, ?, ?, ?, ?)"
+                    cursor.execute(query, [fn, ln, gid, hashed_pw, c_id, email])
+                    cursor.commit()
+                    return make_response('Success', 201)
+                else:
+                    return make_response('Invalid OTP', 404)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return make_response("An error occurred", 500)
 
 
 @app.route("/api/v1.0/login", methods=["POST"])
@@ -331,6 +335,9 @@ def match_postcode_with_constituency(postcode):
         return my_dictionary[postcode]
     else:
         return None
+
+def generate_otp():
+    return str(random.randint(OTP_RANGE_MIN, OTP_RANGE_MAX))
 
 
 if __name__ == "__main__":
