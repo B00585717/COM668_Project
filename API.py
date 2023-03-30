@@ -20,11 +20,10 @@ SQLdb = DBConfig()
 cursor = SQLdb.get_cursor()
 
 # Constants
-GOV_ID_LENGTH = config('GID_LENGTH')
-OTP_RANGE_MIN = config('OTP_MIN')
-OTP_RANGE_MAX = config('OTP_MAX')
-PASSWORD_LENGTH = config('PW_LENGTH')
-
+GOV_ID_LENGTH = 8
+OTP_RANGE_MIN = 100000
+OTP_RANGE_MAX = 999999
+PASSWORD_LENGTH = 8
 
 # Regular expression for a properly constructed email address
 email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
@@ -335,6 +334,7 @@ def match_postcode_with_constituency(postcode):
         return my_dictionary[postcode]
     else:
         return None
+
 
 def generate_otp():
     return str(random.randint(OTP_RANGE_MIN, OTP_RANGE_MAX))
