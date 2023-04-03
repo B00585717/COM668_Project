@@ -23,8 +23,6 @@ export class CandidatesComponent {
 
   ngOnInit() {
     this.candidate_list = this.webService.getCandidates();
-    this.party_list = this.webService.getParties();
-    this.party = this.webService.getParty(this.party_list.partyId)
   }
 
   onSubmit() {
@@ -42,7 +40,5 @@ export class CandidatesComponent {
     });
 
     this.candidate_list = this.webService.getCandidates();
-    this.party_list = this.webService.getParties();
-    this.party_list = this.webService.getParty(this.route.snapshot.params['id']);
   }
 }

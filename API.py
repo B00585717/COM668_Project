@@ -9,6 +9,7 @@ from flask import Flask, request, jsonify, make_response, json, session
 from flask_jwt_extended import JWTManager
 from DBConfig import DBConfig
 from flask_cors import CORS
+import pyotp
 
 app = Flask(__name__)
 app.secret_key = config('SK')
@@ -115,7 +116,7 @@ def login():
         return jsonify({'message': 'User not found.'}), 404
 
 
-@app.route('/profile')
+@app.route('/api/v1.0/profile')
 def profile():
     # Check if the user is logged in
     if 'user_id' not in session:
@@ -269,7 +270,22 @@ def delete_candidate():
 @app.route("/api/v1.0/candidates", methods=["GET"])
 def show_all_candidates():
     data_to_return = []
-    query = "SELECT * FROM Candidate"
+    query = "SELECT Candidate.*,Party.party_name " \
+            "FROM Candidate " \
+            "JOIN Party ON " \
+            "Candidate.party_id=party.party_id "
+    cursor.execute(query)
+    for row in cursor.fetchall():
+        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
+                     "party_id": row[3], "image": row[5], "statement": row[7], "party_name": row[8]}
+        data_to_return.append(item_dict)
+    return make_response(jsonify(data_to_return), 200)
+
+
+@app.route("/api/v1.0/test", methods=["GET"])
+def test():
+    data_to_return = []
+    query = "SELECT"
     cursor.execute(query)
     for row in cursor.fetchall():
         item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
