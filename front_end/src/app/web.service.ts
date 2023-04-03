@@ -7,6 +7,8 @@ export class WebService {
   private partyId: any;
   private candidateId: any;
   private voterId: any;
+
+  private userId: any;
 constructor(private http: HttpClient) {}
 
   getParties(){
@@ -25,6 +27,11 @@ constructor(private http: HttpClient) {}
   getCandidate(c_id: any){
     this.candidateId = c_id
     return this.http.get('http://localhost:5000/api/v1.0/candidates/' + this.candidateId);
+  }
+
+  getProfile(u_id: any){
+    this.userId = u_id
+    return this.http.get('http://localhost:5000/api/v1.0/profile/' + this.userId);
   }
 
   addParty(party: any){

@@ -1,0 +1,25 @@
+<div class="container" style="margin-top:120px;">
+  <div class="row">
+    <div class="col">
+      <div *ngFor="let candidate of candidate_list | async">
+        <div class="card mb-3" style="max-width: 1000px;">
+          <div class="row g-0">
+            <div class="col-md-4">
+              <img src="{{candidate.image}}" class="img-fluid rounded-start" alt="..." style="cursor: pointer" [routerLink]="['/candidates/'+ candidate.candidate_id]">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{candidate.candidate_firstname}} {{candidate.candidate_lastname}}</h5>
+                <div>
+
+                <a class="card-text" routerLink="/parties/{{candidate.party_id}}">Party name = {{party.party_name}}</a>
+                <p class="card-text">{{candidate.statement}}</p>
+                    </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- col -->
+  </div> <!-- row -->
+</div> <!-- container -->
