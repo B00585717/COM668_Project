@@ -42,6 +42,11 @@ constructor(private http: HttpClient) {}
     return this.http.post('http://localhost:5000/api/v1.0/register', formData);
   }
 
+  login(voter: any){
+    let formData = this.loginForm(voter);
+    return this.http.post('http://localhost:5000/api/v1.0/login', formData)
+  }
+
   updateParty(party: any){
     let formData = this.partyForm(party);
     return this.http.put('http://localhost:5000/api/v1.0/parties/'+ this.partyId, formData);
@@ -65,9 +70,19 @@ constructor(private http: HttpClient) {}
     formData.append("last_name", voter.last_name);
     formData.append("email", voter.email);
     formData.append("password", voter.password);
+    formData.append("postcode", voter.postcode);
 
     return formData;
   }
+
+  private loginForm(voter: any) {
+
+    let formData = new FormData()
+    formData.append("gov_id", voter.gov_id);
+    formData.append("password", voter.password)
+
+    return formData;
+}
 
   private updatePasswordForm(voter: any) {
 

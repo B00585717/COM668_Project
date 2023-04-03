@@ -24,6 +24,7 @@ export class RegisterComponent {
       last_name: ['', Validators.required],
       email: ['', Validators.required],
       password: ['', Validators.required],
+      postcode: ['', Validators.required],
       recaptcha: ['', Validators.required]
     });
     this.siteKey = "6LfJZPwjAAAAAANhjiBGN5hCBYhL4wCh4-_eFnUv"
