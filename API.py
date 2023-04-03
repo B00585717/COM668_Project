@@ -282,18 +282,6 @@ def show_all_candidates():
     return make_response(jsonify(data_to_return), 200)
 
 
-@app.route("/api/v1.0/test", methods=["GET"])
-def test():
-    data_to_return = []
-    query = "SELECT"
-    cursor.execute(query)
-    for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
-                     "party_id": row[3], "image": row[5], "statement": row[7]}
-        data_to_return.append(item_dict)
-    return make_response(jsonify(data_to_return), 200)
-
-
 @app.route("/api/v1.0/voters", methods=["GET"])
 def show_all_voters():
     data_to_return = []
@@ -309,11 +297,16 @@ def show_all_voters():
 @app.route("/api/v1.0/candidates/<id>", methods=["GET"])
 def show_one_candidate(id):
     data_to_return = []
-    query = "SELECT * FROM Candidate WHERE candidate_id = ?"
+    query = "SELECT Candidate.*,Party.party_name, Party.image " \
+            "FROM Candidate " \
+            "JOIN Party ON " \
+            "Candidate.party_id=party.party_id " \
+            "WHERE candidate_id = ?"
     cursor.execute(query, id)
     for row in cursor.fetchall():
         item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
-                     "party_id": row[3], "image": row[5], "statement": row[7]}
+                     "party_id": row[3], "image": row[5], "statement": row[7],
+                     "party_name": row[8], "party_image": row[9]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 

@@ -12,10 +12,7 @@ import { ActivatedRoute } from "@angular/router";
 export class CandidatesComponent {
 
   candidate_list: any = [];
-  party_list: any = [];
-
   candidate_form: any;
-  party: any;
 
 
   constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
@@ -39,6 +36,5 @@ export class CandidatesComponent {
       statement:'',
     });
 
-    this.candidate_list = this.webService.getCandidates();
   }
 }

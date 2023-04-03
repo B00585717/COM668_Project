@@ -27,7 +27,7 @@ export class PartyComponent {
     });
 
     this.party_form = this.formBuilder.group({
-      party_name: 'testing',
+      party_name: '',
       image: '',
       manifestio: ''
     });
