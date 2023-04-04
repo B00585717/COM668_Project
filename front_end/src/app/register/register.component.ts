@@ -3,6 +3,7 @@ import {FormBuilder, Validators} from "@angular/forms";
 import {WebService} from "../web.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import { HttpClient } from '@angular/common/http';
+import { EmailService } from '../email.service';
 
 
 @Component({
@@ -16,15 +17,17 @@ export class RegisterComponent {
   public siteKey: any;
   email: any;
 
-  constructor(public webService: WebService, private router: Router, private formBuilder: FormBuilder, private http: HttpClient) {
+  constructor(public webService: WebService, private router: Router, private formBuilder: FormBuilder, private http: HttpClient, private emailService: EmailService) {
   }
 
   ngOnInit() {
+    const navigation = this.router.getCurrentNavigation();
+    const emailFromVerification = navigation && navigation.extras.state && navigation.extras.state["email"];
 
     this.registrationForm = this.formBuilder.group({
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
-      email: ['', Validators.required],
+      email: [emailFromVerification || '', Validators.required],
       password: ['', Validators.required],
       postcode: ['', Validators.required],
       otp: ['', Validators.required],
@@ -32,6 +35,9 @@ export class RegisterComponent {
     });
     this.siteKey = "6LfJZPwjAAAAAANhjiBGN5hCBYhL4wCh4-_eFnUv"
 
+    this.emailService.currentEmail.subscribe((email) => {
+      this.registrationForm.controls['email'].setValue(email);
+    });
   }
 
   onSubmit() {
@@ -44,21 +50,6 @@ export class RegisterComponent {
     },
       (error) => {
         console.error('onSubmitError:', error);
-      }
-    );
-  }
-
-  sendOtp() {
-     console.log('Sending OTP request with data:', { email: this.registrationForm.value.email });
-    this.http.post('http://localhost:5000/api/v1.0/verification', { email: this.registrationForm.value.email }, {
-      headers: { 'Content-Type': 'application/json'
-      }}).subscribe(
-      () => {
-        // Navigate to the registration form component after sending the OTP
-
-      },
-      (error) => {
-        console.error('sendOtp error:', error);
       }
     );
   }
