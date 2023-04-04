@@ -47,7 +47,7 @@ constructor(private http: HttpClient) {}
 
   addVoter(voter: any){
     let formData = this.voterForm(voter);
-    return this.http.post('http://localhost:5000/api/v1.0/register', formData);
+    return this.http.post('http://localhost:5000/api/v1.0/register', JSON.stringify(voter), {headers: { 'Content-Type': 'application/json' }});
   }
 
   login(voter: any){
