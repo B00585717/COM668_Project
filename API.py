@@ -5,7 +5,7 @@ import bcrypt
 from datetime import timedelta
 from random import randint
 from decouple import config
-from flask import Flask, request, jsonify, make_response, json, session
+from flask import Flask, request, jsonify, make_response, json
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from DBConfig import DBConfig
 from flask_cors import CORS
@@ -31,43 +31,10 @@ PASSWORD_LENGTH = 8
 postcode_regex = r'^[A-Z0-9]{3}([A-Z0-9](?=\s*[A-Z0-9]{3}|$))?'
 
 
-def validate_email(email):
-    # Regular expression for a properly constructed email address
-    email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
-
-    if re.match(email_regex, email):
-        return True
-    return False
-
-
-def validate_postcode(postcode):
-    if re.search(postcode_regex, postcode):
-        return True
-    return False
-
-
-def verify_otp(email, otp):
-    cursor.execute('SELECT * FROM Verification WHERE email = ? AND otp = ?', (email, otp))
-    temp_registration = cursor.fetchone()
-    if temp_registration:
-        return True
-    return False
-
-
-def user_exists(email):
-    cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
-    user = cursor.fetchone()
-    if user:
-        return True
-    return False
-
-
 @app.route("/api/v1.0/register", methods=["POST"])
 def register():
     try:
-        print("Data received:", request.get_data())
         data = request.get_json()
-        print("Data Reveieved:", data)
 
         first_name = data.get("first_name")
         last_name = data.get("last_name")
@@ -123,18 +90,16 @@ def verification():
         request_data = request.get_json()
         email = request_data.get("email")
 
-        cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
-        user = cursor.fetchone()
+        user = get_user_by_email(email)
+
         if user:
-            return make_response("User already exists!", 403)
+            return make_response(jsonify({"message": "User already exists!"}), 403)
 
         # Generate a random 6-digit OTP
         OTP = generate_otp()
 
         # Use GoogleAPI to send email containing otp
-        email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {OTP}")
-        if not email_sent:
-            return make_response("Failed to send email", 500)
+        send_otp(email, OTP)
 
         cursor.execute('SELECT * FROM Verification WHERE email = ?', (email,))
         user = cursor.fetchone()
@@ -150,7 +115,7 @@ def verification():
             cursor.execute(query, [email, OTP])
             cursor.commit()
 
-        return make_response(jsonify('OTP sent', 200))
+        return make_response(jsonify({'message': 'OTP sent'}), 200)
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -162,21 +127,17 @@ def login():
     gov_id = request.form['gov_id']
     password = request.form['password']
 
-    # Query the Azure SQL Database to check if the gov_id and password are correct
-    cursor.execute(f"SELECT * FROM Voter WHERE gov_id='{gov_id}'")
-    user = cursor.fetchone()
+    user = get_user_by_gov_id(gov_id)
 
     # Check if the user was found in the database
     if user:
-        hashed_password = user[4]
-        if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+        if check_password(password, user[4]):
             access_token = create_access_token(identity=gov_id)
             # Return access token
             return jsonify({'access_token': access_token})
         else:
             return jsonify({'message': 'Incorrect password.'}), 401
     else:
-        # Return an error message
         return jsonify({'message': 'User not found.'}), 404
 
 
@@ -409,6 +370,7 @@ def update_password(id):
 
 
 ########## HELPER FUNCTIONS ##########
+
 def gov_id_generator(n):
     range_start = 10 ** (n - 1)
     range_end = (10 ** n) - 1
@@ -429,6 +391,57 @@ def match_postcode_with_constituency(postcode):
 
 def generate_otp():
     return str(random.randint(OTP_RANGE_MIN, OTP_RANGE_MAX))
+
+
+def validate_email(email):
+    # Regular expression for a properly constructed email address
+    email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
+
+    if re.match(email_regex, email):
+        return True
+    return False
+
+
+def validate_postcode(postcode):
+    if re.search(postcode_regex, postcode):
+        return True
+    return False
+
+
+def verify_otp(email, otp):
+    cursor.execute('SELECT * FROM Verification WHERE email = ? AND otp = ?', (email, otp))
+    temp_registration = cursor.fetchone()
+    if temp_registration:
+        return True
+    return False
+
+
+def user_exists(email):
+    cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
+    user = cursor.fetchone()
+    if user:
+        return True
+    return False
+
+
+def get_user_by_gov_id(gov_id):
+    cursor.execute(f"SELECT * FROM Voter WHERE gov_id='{gov_id}'")
+    return cursor.fetchone()
+
+
+def get_user_by_email(email):
+    cursor.execute(f"SELECT * FROM Voter WHERE email='{email}'")
+    return cursor.fetchone()
+
+
+def check_password(password, hashed_password):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+
+def send_otp(email, otp):
+    email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
+    if not email_sent:
+        return make_response("Failed to send email", 500)
 
 
 if __name__ == "__main__":
