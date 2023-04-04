@@ -35,8 +35,12 @@ export class RegisterComponent {
   onSubmit() {
     //console log for testing
     console.log(this.registrationForm.value);
-    this.webService.addVoter(this.registrationForm.value).subscribe((response: any) => {
-      this.router.navigate(['/login']);
-    });
+    this.webService.addVoter(this.registrationForm.value).subscribe(
+      () => { this.router.navigate(['/login']);
+    },
+      (error) => {
+        console.error('Error sending OTP:', error);
+      }
+    );
   }
 }
