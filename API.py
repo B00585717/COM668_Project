@@ -14,6 +14,7 @@ app = Flask(__name__)
 app.secret_key = config('SK')
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 CORS(app)
 
 jwt = JWTManager(app)
@@ -26,70 +27,94 @@ OTP_RANGE_MIN = 100000
 OTP_RANGE_MAX = 999999
 PASSWORD_LENGTH = 8
 
-# Regular expression for a properly constructed email address
-email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
-
 # Regular expression that takes the first part of postcode
 postcode_regex = r'^[A-Z0-9]{3}([A-Z0-9](?=\s*[A-Z0-9]{3}|$))?'
+
+
+def validate_email(email):
+    # Regular expression for a properly constructed email address
+    email_regex = r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b'
+
+    if re.match(email_regex, email):
+        return True
+    return False
+
+
+def validate_postcode(postcode):
+    if re.search(postcode_regex, postcode):
+        return True
+    return False
+
+
+def verify_otp(email, otp):
+    cursor.execute('SELECT * FROM Verification WHERE email = ? AND otp = ?', (email, otp))
+    temp_registration = cursor.fetchone()
+    if temp_registration:
+        return True
+    return False
+
+
+def user_exists(email):
+    cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
+    user = cursor.fetchone()
+    if user:
+        return True
+    return False
 
 
 @app.route("/api/v1.0/register", methods=["POST"])
 def register():
     try:
-        if "first_name" in request.form \
-                and "last_name" in request.form \
-                and "password" in request.form \
-                and "postcode" in request.form \
-                and "email" in request.form \
-                and "otp" in request.form:
-            fn = request.form["first_name"]
-            ln = request.form["last_name"]
-            gid = gov_id_generator(GOV_ID_LENGTH)
-            pw = request.form["password"]
-            postcode = request.form["postcode"]
-            email = request.form["email"]
-            otp = request.form["otp"]
+        print("Data received:", request.get_data())
+        data = request.get_json()
+        print("Data Reveieved:", data)
 
-            # Check if the OTP and email match a temporary registration record
-            cursor.execute('SELECT * FROM Verification WHERE email = ? AND otp = ?', (email, otp))
-            temp_registration = cursor.fetchone()
-            if not temp_registration:
-                return make_response('Invalid OTP or email', 404)
+        first_name = data.get("first_name")
+        last_name = data.get("last_name")
+        password = data.get("password")
+        postcode = data.get("postcode")
+        email = data.get("email")
+        otp = data.get("otp")
 
-            # Password is hashed before it is inserted into database
-            hashed_pw = bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt())
+        # Validation
+        if not (first_name and last_name and password and postcode and email and otp):
+            return make_response(jsonify({"message": "Missing required fields"}), 400)
 
-            cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
-            user = cursor.fetchone()
-            if user:
-                return make_response("User already exists!", 403)
+        if not validate_email(email):
+            return make_response(jsonify({"message": "Invalid email address"}), 400)
 
-            elif not re.match(email_regex, email):
-                return make_response("Invalid email address", 404)
+        if not validate_postcode(postcode):
+            return make_response(jsonify({"message": "Invalid postcode"}), 400)
 
-            elif not re.search(postcode_regex, postcode).group(0):
-                return make_response('Invalid Postcode', 404)
+        if len(password) < PASSWORD_LENGTH:
+            return make_response(jsonify({"message": "Password must be at least 8 characters!"}), 400)
 
-            elif len(pw) < PASSWORD_LENGTH:
-                return make_response("Password must be at least 8 characters!", 404)
+        if not verify_otp(email, otp):
+            return make_response(jsonify({"message": "Invalid OTP or email"}), 400)
 
-            else:
-                postcode = re.search(postcode_regex, postcode).group(0)
-                c_id = match_postcode_with_constituency(postcode)
+        # All validations passed, proceed with registration
 
-                query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
-                        "VALUES(?, ?, ?, ?, ?, ?)"
-                cursor.execute(query, [fn, ln, gid, hashed_pw, c_id, email])
-                cursor.commit()
+        # Password is hashed before it is inserted into database
+        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        c_id = match_postcode_with_constituency(re.search(postcode_regex, postcode).group(0))
+        gov_id = gov_id_generator(GOV_ID_LENGTH)
 
-                cursor.execute('DELETE FROM Verification WHERE email = ? AND otp = ?', (email, otp))
-                cursor.commit()
+        if user_exists(email):
+            return make_response(jsonify({"message": "User already exists!"}), 403)
+        else:
+            query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
+                    "VALUES(?, ?, ?, ?, ?, ?)"
+            cursor.execute(query, [first_name, last_name, gov_id, hashed_pw, c_id, email])
+            cursor.commit()
 
-                return make_response('Success', 201)
+            cursor.execute('DELETE FROM Verification WHERE email = ? AND otp = ?', (email, otp))
+            cursor.commit()
+
+            return make_response(jsonify({"message": "Success"}), 201)
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        return make_response("An error occurred", 500)
+        return make_response(jsonify("An error occurred", 500))
 
 
 @app.route("/api/v1.0/verification", methods=["POST"])
@@ -155,17 +180,21 @@ def login():
         return jsonify({'message': 'User not found.'}), 404
 
 
-@app.route('/api/v1.0/profile', methods = ["GET"])
+@app.route('/api/v1.0/profile', methods=["GET"])
 @jwt_required()
 def profile():
     gov_id = get_jwt_identity()
 
     cursor.execute("SELECT Voter.*,Constituency.constituency_name "
                    "FROM Voter "
-                   f"JOIN Constituency ON Voter.constituency_id=constituency.constituency_id WHERE gov_id='{gov_id}'"
+                   f"JOIN Constituency ON Voter.constituency_id=Constituency.constituency_id WHERE gov_id='{gov_id}'"
                    )
 
     user = cursor.fetchone()
+
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+
     return jsonify({'first_name': user[1],
                     'last_name': user[2],
                     'gov_id': user[3],
