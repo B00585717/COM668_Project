@@ -14,7 +14,10 @@ import {CandidateComponent} from './candidate.component';
 import {PartiesComponent} from './parties.component';
 import {PartyComponent} from './party.component';
 import {ReactiveFormsModule} from "@angular/forms";
+import {ProfileComponent} from './profile.component';
 import {NgxCaptchaModule} from "ngx-captcha";
+import {FormsModule} from '@angular/forms';
+import {LogoutComponent} from "./logout.component";
 
 
 var routes: any = [
@@ -45,6 +48,14 @@ var routes: any = [
   {
     path: 'candidates/:id',
     component: CandidateComponent
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent
+  },
+  {
+    path: 'logout',
+    component: LogoutComponent
   }
 
   ]
@@ -52,7 +63,7 @@ var routes: any = [
 
 @NgModule({
   declarations: [
-    AppComponent, HomeComponent, RegisterComponent, LoginComponent, CandidateComponent, PartyComponent, CandidatesComponent, PartiesComponent
+    AppComponent, HomeComponent, RegisterComponent, LoginComponent, CandidateComponent, PartyComponent, CandidatesComponent, PartiesComponent, ProfileComponent, LogoutComponent
   ],
   imports: [
     BrowserModule,
@@ -60,7 +71,8 @@ var routes: any = [
     HttpClientModule,
     RouterModule.forRoot(routes),
     ReactiveFormsModule,
-    NgxCaptchaModule
+    NgxCaptchaModule,
+    FormsModule
   ],
   providers: [WebService],
   bootstrap: [AppComponent]

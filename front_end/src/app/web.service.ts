@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
+import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class WebService {
@@ -8,7 +9,6 @@ export class WebService {
   private candidateId: any;
   private voterId: any;
 
-  private userId: any;
 constructor(private http: HttpClient) {}
 
   getParties(){
@@ -29,9 +29,10 @@ constructor(private http: HttpClient) {}
     return this.http.get('http://localhost:5000/api/v1.0/candidates/' + this.candidateId);
   }
 
-  getProfile(u_id: any){
-    this.userId = u_id
-    return this.http.get('http://localhost:5000/api/v1.0/profile/' + this.userId);
+  getProfile(){
+    const token = localStorage.getItem('access_token');
+    const headers = { Authorization: `Bearer ${token}` };
+    return this.http.get('http://localhost:5000/api/v1.0/profile', { headers });
   }
 
   addParty(party: any){
@@ -51,7 +52,13 @@ constructor(private http: HttpClient) {}
 
   login(voter: any){
     let formData = this.loginForm(voter);
-    return this.http.post('http://localhost:5000/api/v1.0/login', formData)
+    return this.http.post('http://localhost:5000/api/v1.0/login', formData).pipe(tap((response: any) => {
+        localStorage.setItem('access_token', response.access_token);
+      }))
+  }
+
+  logout() {
+    localStorage.removeItem('access_token');
   }
 
   updateParty(party: any){

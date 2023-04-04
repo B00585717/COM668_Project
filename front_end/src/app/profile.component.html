@@ -1,0 +1,10 @@
+<div *ngIf="profile; else elseBlock">
+  <h2>Profile</h2>
+  <p>First Name: {{ profile.first_name }}</p>
+  <p>Last Name: {{ profile.last_name }}</p>
+  <p>Government ID: {{ profile.gov_id }}</p>
+  <p>Constituency: {{ profile.constituency_name }}</p>
+  <p>Email: {{ profile.email }}</p>
+</div>
+
+<ng-template #elseBlock>Content to render when condition is false.</ng-template>

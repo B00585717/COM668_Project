@@ -1,7 +1,8 @@
 import {Component} from "@angular/core";
 import {WebService} from "./web.service";
 import {FormBuilder, Validators} from "@angular/forms";
-import {ActivatedRoute} from "@angular/router";
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'login',
@@ -10,25 +11,20 @@ import {ActivatedRoute} from "@angular/router";
 })
 
 export class LoginComponent {
+  gov_id: any;
+  password: any;
 
-  loginForm: any;
-
-  constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
-  }
-  ngOnInit() {
-
-    this.loginForm = this.formBuilder.group({
-      gov_id: ['', Validators.required],
-      password: ['', Validators.required],
-
-    });
-  }
+  constructor(private webService: WebService, private router: Router) {}
 
   onSubmit() {
-    //console log for testing
-    console.log(this.loginForm.value);
-    this.webService.login(this.loginForm.value).subscribe((response: any) => {
-      this.loginForm.reset();
-    });
+    this.webService.login({ gov_id: this.gov_id, password: this.password }).subscribe(
+      () => {
+        console.log('Login successful');
+        this.router.navigate(['/profile']);
+      },
+      (error: any) => {
+        console.error('Login failed:', error);
+      }
+    );
   }
 }
