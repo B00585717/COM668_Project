@@ -6,13 +6,13 @@ from datetime import timedelta
 from random import randint
 from decouple import config
 from flask import Flask, request, jsonify, make_response, json, session
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from DBConfig import DBConfig
 from flask_cors import CORS
-import pyotp
 
 app = Flask(__name__)
 app.secret_key = config('SK')
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
 CORS(app)
 
@@ -105,10 +105,9 @@ def login():
     if user:
         hashed_password = user[4]
         if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
-            # Store the user ID in the session
-            session['user_id'] = user[0]
-            # Return a success message
-            return jsonify({'Success!': 200})
+            access_token = create_access_token(identity=gov_id)
+            # Return access token
+            return jsonify({'access_token': access_token})
         else:
             return jsonify({'message': 'Incorrect password.'}), 401
     else:
@@ -116,28 +115,22 @@ def login():
         return jsonify({'message': 'User not found.'}), 404
 
 
-@app.route('/api/v1.0/profile')
+@app.route('/api/v1.0/profile', methods = ["GET"])
+@jwt_required()
 def profile():
-    # Check if the user is logged in
-    if 'user_id' not in session:
-        # Redirect to the login page if the user is not logged in
-        return jsonify({'message': 'You must log in to view this page.'}), 401
+    gov_id = get_jwt_identity()
 
-    # Query the Azure SQL Database to get the user's profile information
-    cursor.execute(f"SELECT * FROM Voter WHERE voter_id='{session['user_id']}'")
+    cursor.execute("SELECT Voter.*,Constituency.constituency_name "
+                   "FROM Voter "
+                   f"JOIN Constituency ON Voter.constituency_id=constituency.constituency_id WHERE gov_id='{gov_id}'"
+                   )
+
     user = cursor.fetchone()
-
-    # Return the user's profile information
-    return jsonify({'first name': user[1], 'last name': user[2]})
-
-
-@app.route('/logout')
-def logout():
-    # Clear the user ID from the session
-    session.pop('user_id', None)
-
-    # Return a success message
-    return jsonify({'message': 'Logout successful!'})
+    return jsonify({'first_name': user[1],
+                    'last_name': user[2],
+                    'gov_id': user[3],
+                    'constituency_name': user[8],
+                    'email': user[6]})
 
 
 @app.route("/api/v1.0/parties", methods=["GET"])
@@ -146,7 +139,10 @@ def show_all_parties():
     query = "SELECT * FROM Party"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"party_id": row[0], "party_name": row[1], "image": row[2], "manifesto": row[3]}
+        item_dict = {"party_id": row[0],
+                     "party_name": row[1],
+                     "image": row[2],
+                     "manifesto": row[3]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -182,7 +178,10 @@ def show_one_party(id):
     query = "SELECT * FROM Party WHERE party_id = ?"
     cursor.execute(query, (id,))
     for row in cursor.fetchall():
-        item_dict = {"party_id": row[0], "party_name": row[1], "image": row[2], "manifesto": row[3]}
+        item_dict = {"party_id": row[0],
+                     "party_name": row[1],
+                     "image": row[2],
+                     "manifesto": row[3]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -276,8 +275,13 @@ def show_all_candidates():
             "Candidate.party_id=party.party_id "
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
-                     "party_id": row[3], "image": row[5], "statement": row[7], "party_name": row[8]}
+        item_dict = {"candidate_id": row[0],
+                     "candidate_firstname": row[1],
+                     "candidate_lastname": row[2],
+                     "party_id": row[3],
+                     "image": row[5],
+                     "statement": row[7],
+                     "party_name": row[8]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -288,8 +292,12 @@ def show_all_voters():
     query = "SELECT * FROM Voter"
     cursor.execute(query)
     for row in cursor.fetchall():
-        item_dict = {"voter_id": row[0], "first_name": row[1], "last_name": row[2], "gov_id": row[3],
-                     "password": row[4], "email": row[6]}
+        item_dict = {"voter_id": row[0],
+                     "first_name": row[1],
+                     "last_name": row[2],
+                     "gov_id": row[3],
+                     "password": row[4],
+                     "email": row[6]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
@@ -304,9 +312,14 @@ def show_one_candidate(id):
             "WHERE candidate_id = ?"
     cursor.execute(query, id)
     for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0], "candidate_firstname": row[1], "candidate_lastname": row[2],
-                     "party_id": row[3], "image": row[5], "statement": row[7],
-                     "party_name": row[8], "party_image": row[9]}
+        item_dict = {"candidate_id": row[0],
+                     "candidate_firstname": row[1],
+                     "candidate_lastname": row[2],
+                     "party_id": row[3],
+                     "image": row[5],
+                     "statement": row[7],
+                     "party_name": row[8],
+                     "party_image": row[9]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
