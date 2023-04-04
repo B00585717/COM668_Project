@@ -84,6 +84,7 @@ constructor(private http: HttpClient) {}
     formData.append("last_name", voter.last_name);
     formData.append("email", voter.email);
     formData.append("password", voter.password);
+    formData.append("otp", voter.otp);
     formData.append("postcode", voter.postcode);
 
     return formData;

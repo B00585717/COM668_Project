@@ -40,19 +40,24 @@ def register():
                 and "last_name" in request.form \
                 and "password" in request.form \
                 and "postcode" in request.form \
-                and "email" in request.form:
+                and "email" in request.form \
+                and "otp" in request.form:
             fn = request.form["first_name"]
             ln = request.form["last_name"]
             gid = gov_id_generator(GOV_ID_LENGTH)
             pw = request.form["password"]
             postcode = request.form["postcode"]
             email = request.form["email"]
+            otp = request.form["otp"]
+
+            # Check if the OTP and email match a temporary registration record
+            cursor.execute('SELECT * FROM Verification WHERE email = ? AND otp = ?', (email, otp))
+            temp_registration = cursor.fetchone()
+            if not temp_registration:
+                return make_response('Invalid OTP or email', 404)
 
             # Password is hashed before it is inserted into database
             hashed_pw = bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt())
-
-            # Generate a random 6-digit OTP
-            otp = generate_otp()
 
             cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
             user = cursor.fetchone()
@@ -69,24 +74,59 @@ def register():
                 return make_response("Password must be at least 8 characters!", 404)
 
             else:
-                # Use GoogleAPI to send email containing otp
-                email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
-
-                if not email_sent:
-                    return make_response("Failed to send email", 500)
-
                 postcode = re.search(postcode_regex, postcode).group(0)
                 c_id = match_postcode_with_constituency(postcode)
 
-                # TODO: Current implementation of 2fa uses input from console to authenticate otp, will change later
-                if input("Enter the OTP sent to your email: ") == otp:
-                    query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
-                            "VALUES(?, ?, ?, ?, ?, ?)"
-                    cursor.execute(query, [fn, ln, gid, hashed_pw, c_id, email])
-                    cursor.commit()
-                    return make_response('Success', 201)
-                else:
-                    return make_response('Invalid OTP', 404)
+                query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
+                        "VALUES(?, ?, ?, ?, ?, ?)"
+                cursor.execute(query, [fn, ln, gid, hashed_pw, c_id, email])
+                cursor.commit()
+
+                cursor.execute('DELETE FROM Verification WHERE email = ? AND otp = ?', (email, otp))
+                cursor.commit()
+
+                return make_response('Success', 201)
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return make_response("An error occurred", 500)
+
+
+@app.route("/api/v1.0/verification", methods=["POST"])
+def verification():
+    try:
+        request_data = request.get_json()
+        email = request_data.get("email")
+
+        cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
+        user = cursor.fetchone()
+        if user:
+            return make_response("User already exists!", 403)
+
+        # Generate a random 6-digit OTP
+        OTP = generate_otp()
+
+        # Use GoogleAPI to send email containing otp
+        email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {OTP}")
+        if not email_sent:
+            return make_response("Failed to send email", 500)
+
+        cursor.execute('SELECT * FROM Verification WHERE email = ?', (email,))
+        user = cursor.fetchone()
+
+        if user:
+            # New otp will overwrite old one to prevent duplicate entries
+            cursor.execute('UPDATE Verification SET otp = ? WHERE email = ?', (OTP, email,))
+            cursor.commit()
+
+        else:
+            # Save the OTP and email as a temporary registration record
+            query = "INSERT INTO Verification(email, otp) VALUES(?, ?)"
+            cursor.execute(query, [email, OTP])
+            cursor.commit()
+
+        return make_response(jsonify('OTP sent', 200))
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return make_response("An error occurred", 500)
@@ -129,7 +169,7 @@ def profile():
     return jsonify({'first_name': user[1],
                     'last_name': user[2],
                     'gov_id': user[3],
-                    'constituency_name': user[8],
+                    'constituency_name': user[7],
                     'email': user[6]})
 
 

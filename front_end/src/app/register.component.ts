@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
 import {FormBuilder, Validators} from "@angular/forms";
 import {WebService} from "./web.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 
 
 @Component({
@@ -14,7 +14,7 @@ export class RegisterComponent {
   registrationForm: any;
   public siteKey: any;
 
-  constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
+  constructor(public webService: WebService, private router: Router, private formBuilder: FormBuilder) {
   }
 
   ngOnInit() {
@@ -25,6 +25,7 @@ export class RegisterComponent {
       email: ['', Validators.required],
       password: ['', Validators.required],
       postcode: ['', Validators.required],
+      otp: ['', Validators.required],
       recaptcha: ['', Validators.required]
     });
     this.siteKey = "6LfJZPwjAAAAAANhjiBGN5hCBYhL4wCh4-_eFnUv"
@@ -35,7 +36,7 @@ export class RegisterComponent {
     //console log for testing
     console.log(this.registrationForm.value);
     this.webService.addVoter(this.registrationForm.value).subscribe((response: any) => {
-      this.registrationForm.reset();
+      this.router.navigate(['/login']);
     });
   }
 }

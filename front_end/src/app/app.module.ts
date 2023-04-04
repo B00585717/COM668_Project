@@ -18,12 +18,17 @@ import {ProfileComponent} from './profile.component';
 import {NgxCaptchaModule} from "ngx-captcha";
 import {FormsModule} from '@angular/forms';
 import {LogoutComponent} from "./logout.component";
+import {VerificationComponent} from "./verification.component"
 
 
 var routes: any = [
   {
     path: '',
     component: HomeComponent
+  },
+    {
+    path: 'verification',
+    component: VerificationComponent
   },
   {
     path: 'register',
@@ -63,7 +68,17 @@ var routes: any = [
 
 @NgModule({
   declarations: [
-    AppComponent, HomeComponent, RegisterComponent, LoginComponent, CandidateComponent, PartyComponent, CandidatesComponent, PartiesComponent, ProfileComponent, LogoutComponent
+    AppComponent,
+    HomeComponent,
+    RegisterComponent,
+    LoginComponent,
+    CandidateComponent,
+    PartyComponent,
+    CandidatesComponent,
+    PartiesComponent,
+    ProfileComponent,
+    LogoutComponent,
+    VerificationComponent
   ],
   imports: [
     BrowserModule,
