@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {FormBuilder, Validators} from "@angular/forms";
-import {WebService} from "./web.service";
+import {WebService} from "../web.service";
 import {ActivatedRoute, Router} from "@angular/router";
 
 

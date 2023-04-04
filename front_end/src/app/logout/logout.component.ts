@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { WebService } from './web.service';
+import { WebService } from '../web.service';
 import { Router } from '@angular/router';
 
 @Component({

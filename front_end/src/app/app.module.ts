@@ -3,22 +3,22 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {HomeComponent} from './home.component';
+import {HomeComponent} from './home/home.component';
 import {RouterModule} from "@angular/router";
 import {HttpClientModule} from "@angular/common/http";
 import {WebService} from "./web.service";
-import {RegisterComponent} from './register.component';
-import {LoginComponent} from './login.component';
-import {CandidatesComponent} from './candidates.component';
-import {CandidateComponent} from './candidate.component';
-import {PartiesComponent} from './parties.component';
-import {PartyComponent} from './party.component';
+import {RegisterComponent} from './register/register.component';
+import {LoginComponent} from './login/login.component';
+import {CandidatesComponent} from './candidates/candidates.component';
+import {CandidateComponent} from './candidate/candidate.component';
+import {PartiesComponent} from './parties/parties.component';
+import {PartyComponent} from './party/party.component';
 import {ReactiveFormsModule} from "@angular/forms";
-import {ProfileComponent} from './profile.component';
+import {ProfileComponent} from './profile/profile.component';
 import {NgxCaptchaModule} from "ngx-captcha";
 import {FormsModule} from '@angular/forms';
-import {LogoutComponent} from "./logout.component";
-import {VerificationComponent} from "./verification.component"
+import {LogoutComponent} from "./logout/logout.component";
+import {VerificationComponent} from "./register/verification.component"
 
 
 var routes: any = [
