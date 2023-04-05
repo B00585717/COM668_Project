@@ -95,7 +95,7 @@ def register():
             session.query(Verification).filter_by(email=email, otp=otp).delete()
             session.commit()
 
-            return make_response(jsonify({"message": "Success"}), 201)
+            return make_response(jsonify({"message": "Success", "gov_id": new_voter.gov_id}), 201)
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -196,6 +196,20 @@ def show_all_parties():
     return make_response(jsonify(party_list), 200)
 
 
+@app.route("/api/v1.0/parties/<id>", methods=["GET"])
+def show_one_party(id):
+    data_to_return = []
+    query = "SELECT * FROM Party WHERE party_id = ?"
+    cursor.execute(query, (id,))
+    for row in cursor.fetchall():
+        item_dict = {"party_id": row[0],
+                     "party_name": row[1],
+                     "image": row[2],
+                     "manifesto": row[3]}
+        data_to_return.append(item_dict)
+    return make_response(jsonify(data_to_return), 200)
+
+
 @app.route("/api/v1.0/parties", methods=["POST"])
 def add_party():
     if "party_name" in request.form \
@@ -222,22 +236,7 @@ def add_party():
             session.add(new_party)
             session.commit()
 
-    return make_response(jsonify({"message": "Party created"}), 201)
-
-
-
-@app.route("/api/v1.0/parties/<id>", methods=["GET"])
-def show_one_party(id):
-    data_to_return = []
-    query = "SELECT * FROM Party WHERE party_id = ?"
-    cursor.execute(query, (id,))
-    for row in cursor.fetchall():
-        item_dict = {"party_id": row[0],
-                     "party_name": row[1],
-                     "image": row[2],
-                     "manifesto": row[3]}
-        data_to_return.append(item_dict)
-    return make_response(jsonify(data_to_return), 200)
+        return make_response(jsonify({"message": "Party created", "party_id": new_party.party_id}), 201)
 
 
 @app.route("/api/v1.0/parties/<id>", methods=["PUT"])
@@ -268,89 +267,21 @@ def edit_party(id):
             session.commit()
 
         return make_response(jsonify("Party updated"), 200)
+    else:
+        return make_response("Invalid request", 400)
 
 
+@app.route("/api/v1.0/parties/<id>", methods=["DELETE"])
 def delete_party(id):
     party = session.query(Party).filter_by(party_id=id).first()
 
     if not party:
-        return make_response("Party not found", 404)
+        return make_response('Party not found', 404)
 
     session.delete(party)
     session.commit()
 
-    return make_response(jsonify("Party deleted"), 200)
-
-
-@app.route("/api/v1.0/candidates/<id>", methods=["PUT"])
-def edit_candidate(id):
-    if "candidate_firstname" in request.form \
-            and "candidate_lastname" in request.form \
-            and "party_id" in request.form \
-            and "image" in request.form \
-            and "constituency_id" in request.form \
-            and "statement" in request.form:
-        fn = request.form["candidate_firstname"]
-        ln = request.form["candidate_lastname"]
-        p_id = request.form["party_id"]
-        im = request.form["image"]
-        c_id = request.form["constituency_id"]
-        rq = request.form["request"]
-
-        candidate = session.query(Candidate).filter_by(candidate_id=id).first()
-        if not candidate:
-            return make_response("Candidate not found", 404)
-
-        candidate.candidate_firstname = fn
-        candidate.candidate_lastname = ln
-        candidate.party_id = p_id
-        candidate.image = im
-        candidate.constituency_id = c_id
-        candidate.statement = rq
-
-        session.commit()
-
-    return make_response(jsonify("Candidate updated"), 200)
-
-
-@app.route("/api/v1.0/candidates", methods=["POST"])
-def add_candidate():
-    if "candidate_firstname" in request.form \
-            and "candidate_lastname" in request.form \
-            and "party_id" in request.form \
-            and "image" in request.form \
-            and "constituency_id" in request.form \
-            and "statement" in request.form:
-        fn = request.form["candidate_firstname"]
-        ln = request.form["candidate_lastname"]
-        p_id = request.form["party_id"]
-        im = request.form["image"]
-        c_id = request.form["constituency_id"]
-        st = request.form["statement"]
-
-        new_candidate = Candidate(
-            candidate_firstname=fn,
-            candidate_lastname=ln,
-            party_id=p_id, image=im,
-            constituency_id=c_id,
-            statement=st)
-
-        session.add(new_candidate)
-        session.commit()
-
-    return make_response(jsonify("Candidate added"), 201)
-
-
-def delete_candidate(id):
-    candidate = session.query(Candidate).filter_by(candidate_id=id).first()
-
-    if not candidate:
-        return make_response("Candidate not found", 404)
-
-    session.delete(candidate)
-    session.commit()
-
-    return make_response(jsonify("Candidate deleted"), 200)
+    return make_response('Party deleted', 200)
 
 
 @app.route("/api/v1.0/candidates", methods=["GET"])
@@ -370,25 +301,6 @@ def show_all_candidates():
             "image": candidate.image,
             "statement": candidate.statement,
             "party_name": party_name
-        }
-        data_to_return.append(item_dict)
-
-    return make_response(jsonify(data_to_return), 200)
-
-
-@app.route("/api/v1.0/voters", methods=["GET"])
-def show_all_voters():
-    voters = session.query(Voter).all()
-
-    data_to_return = []
-    for voter in voters:
-        item_dict = {
-            "voter_id": voter.voter_id,
-            "first_name": voter.first_name,
-            "last_name": voter.last_name,
-            "gov_id": voter.gov_id,
-            "password": voter.password,
-            "email": voter.email
         }
         data_to_return.append(item_dict)
 
@@ -417,6 +329,111 @@ def show_one_candidate(id):
     return make_response(jsonify(data_to_return), 200)
 
 
+@app.route("/api/v1.0/candidates/<id>", methods=["PUT"])
+def edit_candidate(id):
+    if "candidate_firstname" in request.form \
+            and "candidate_lastname" in request.form \
+            and "party_id" in request.form \
+            and "image" in request.form \
+            and "constituency_id" in request.form \
+            and "statement" in request.form:
+        fn = request.form["candidate_firstname"]
+        ln = request.form["candidate_lastname"]
+        p_id = request.form["party_id"]
+        im = request.form["image"]
+        c_id = request.form["constituency_id"]
+        st = request.form["statement"]
+
+        candidate = session.query(Candidate).filter_by(candidate_id=id).first()
+        if not candidate:
+            return make_response("Candidate not found", 404)
+
+        elif not fn or not ln or not c_id or not p_id or not im or not st:
+            return make_response("Please complete form", 404)
+
+        candidate.candidate_firstname = fn
+        candidate.candidate_lastname = ln
+        candidate.party_id = p_id
+        candidate.image = im
+        candidate.constituency_id = c_id
+        candidate.statement = st
+
+        session.commit()
+
+    return make_response(jsonify("Candidate updated"), 200)
+
+
+@app.route("/api/v1.0/candidates", methods=["POST"])
+def add_candidate():
+    if "candidate_firstname" in request.form \
+            and "candidate_lastname" in request.form \
+            and "party_id" in request.form \
+            and "image" in request.form \
+            and "constituency_id" in request.form \
+            and "statement" in request.form:
+        fn = request.form["candidate_firstname"]
+        ln = request.form["candidate_lastname"]
+        p_id = request.form["party_id"]
+        im = request.form["image"]
+        c_id = request.form["constituency_id"]
+        st = request.form["statement"]
+
+        candidate = session.query(Candidate).filter_by(candidate_lastname=ln).first()
+        if candidate:
+            return make_response("Candidate already exists!", 403)
+
+        elif not fn or not ln or not c_id or not p_id or not im or not st:
+            return make_response("Please complete form", 404)
+
+        else:
+            new_candidate = Candidate(
+                candidate_firstname=fn,
+                candidate_lastname=ln,
+                party_id=p_id,
+                image=im,
+                constituency_id=c_id,
+                statement=st)
+
+            session.add(new_candidate)
+            session.commit()
+
+            return make_response(jsonify({"message": "Candidate added", "candidate_id": new_candidate.candidate_id}), 201)
+    else:
+        return make_response("Invalid request", 400)
+
+
+@app.route("/api/v1.0/candidates/<id>", methods=["DELETE"])
+def delete_candidate(id):
+    candidate = session.query(Candidate).filter_by(candidate_id=id).first()
+
+    if not candidate:
+        return make_response("Candidate not found", 404)
+
+    session.delete(candidate)
+    session.commit()
+
+    return make_response('Candidate deleted', 200)
+
+
+@app.route("/api/v1.0/voters", methods=["GET"])
+def show_all_voters():
+    voters = session.query(Voter).all()
+
+    data_to_return = []
+    for voter in voters:
+        item_dict = {
+            "voter_id": voter.voter_id,
+            "first_name": voter.first_name,
+            "last_name": voter.last_name,
+            "gov_id": voter.gov_id,
+            "password": voter.password,
+            "email": voter.email
+        }
+        data_to_return.append(item_dict)
+
+    return make_response(jsonify(data_to_return), 200)
+
+
 @app.route("/api/v1.0/voters/<id>", methods=["PUT"])
 def update_password(id):
     if "password" in request.form:
@@ -437,7 +454,7 @@ def update_password(id):
 
 
 @app.route("/api/v1.0/voters/<id>", methods=["DELETE"])
-def delete_candidate(id):
+def delete_voter(id):
     user = session.query(Voter).filter_by(voter_id=id).first()
 
     if not user:
@@ -446,7 +463,7 @@ def delete_candidate(id):
     session.delete(user)
     session.commit()
 
-    return make_response(jsonify("User deleted"), 200)
+    return make_response('Candidate deleted', 200)
 
 
 ########## HELPER FUNCTIONS ##########
