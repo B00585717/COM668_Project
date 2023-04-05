@@ -1,5 +1,6 @@
 import random
 import re
+from sqlalchemy.orm import sessionmaker
 import GoogleAPI
 import bcrypt
 from datetime import timedelta
@@ -9,6 +10,7 @@ from flask import Flask, request, jsonify, make_response, json
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from DBConfig import DBConfig
 from flask_cors import CORS
+from Models import Voter, Constituency, engine, Verification
 
 app = Flask(__name__)
 app.secret_key = config('SK')
@@ -20,6 +22,12 @@ CORS(app)
 jwt = JWTManager(app)
 SQLdb = DBConfig()
 cursor = SQLdb.get_cursor()
+
+# Create a session factory
+Session = sessionmaker(bind=engine)
+
+# Use the session to interact with the database
+session = Session()
 
 # Constants
 GOV_ID_LENGTH = 8
@@ -69,13 +77,23 @@ def register():
         if user_exists(email):
             return make_response(jsonify({"message": "User already exists!"}), 403)
         else:
-            query = "INSERT INTO Voter(first_name, last_name, gov_id, password, constituency_id, email) " \
-                    "VALUES(?, ?, ?, ?, ?, ?)"
-            cursor.execute(query, [first_name, last_name, gov_id, hashed_pw, c_id, email])
-            cursor.commit()
+            new_voter = Voter(
+                first_name=first_name,
+                last_name=last_name,
+                gov_id=gov_id,
+                password=hashed_pw,
+                constituency_id=c_id,
+                email=email
+            )
 
-            cursor.execute('DELETE FROM Verification WHERE email = ? AND otp = ?', (email, otp))
-            cursor.commit()
+            # Add the new voter to the session
+            session.add(new_voter)
+
+            # Commit the session to save the new voter to the database
+            session.commit()
+
+            session.query(Verification).filter_by(email=email, otp=otp).delete()
+            session.commit()
 
             return make_response(jsonify({"message": "Success"}), 201)
 
@@ -101,13 +119,12 @@ def verification():
         # Use GoogleAPI to send email containing otp
         send_otp(email, OTP)
 
-        cursor.execute('SELECT * FROM Verification WHERE email = ?', (email,))
-        user = cursor.fetchone()
+        user = session.query(Verification).filter_by(email=email).first()
 
         if user:
             # New otp will overwrite old one to prevent duplicate entries
-            cursor.execute('UPDATE Verification SET otp = ? WHERE email = ?', (OTP, email,))
-            cursor.commit()
+            session.query(Verification).filter_by(email=email).update({'otp': OTP})
+            session.commit()
 
         else:
             # Save the OTP and email as a temporary registration record
