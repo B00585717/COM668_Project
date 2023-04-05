@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify, make_response, json
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from DBConfig import DBConfig
 from flask_cors import CORS
-from Models import Voter, Constituency, engine, Verification
+from Models import Voter, Verification, Party, Candidate, engine, Constituency
 
 app = Flask(__name__)
 app.secret_key = config('SK')
@@ -70,7 +70,7 @@ def register():
         # All validations passed, proceed with registration
 
         # Password is hashed before it is inserted into database
-        hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        hashed_pw = encrypt_password(password)
         c_id = match_postcode_with_constituency(re.search(postcode_regex, postcode).group(0))
         gov_id = gov_id_generator(GOV_ID_LENGTH)
 
@@ -114,7 +114,10 @@ def verification():
             return make_response(jsonify({"message": "User already exists!"}), 403)
 
         # Generate a random 6-digit OTP
-        OTP = generate_otp()
+        # OTP = generate_otp()
+
+        # TODO: This is just for testing, the application will use randomly generated otp's
+        OTP = '123456'
 
         # Use GoogleAPI to send email containing otp
         send_otp(email, OTP)
@@ -128,9 +131,8 @@ def verification():
 
         else:
             # Save the OTP and email as a temporary registration record
-            query = "INSERT INTO Verification(email, otp) VALUES(?, ?)"
-            cursor.execute(query, [email, OTP])
-            cursor.commit()
+            session.add(Verification(email=email, otp=OTP))
+            session.commit()
 
         return make_response(jsonify({'message': 'OTP sent'}), 200)
 
@@ -148,7 +150,7 @@ def login():
 
     # Check if the user was found in the database
     if user:
-        if check_password(password, user[4]):
+        if check_password(password, user.get_password()):
             access_token = create_access_token(identity=gov_id)
             # Return access token
             return jsonify({'access_token': access_token})
@@ -163,35 +165,35 @@ def login():
 def profile():
     gov_id = get_jwt_identity()
 
-    cursor.execute("SELECT Voter.*,Constituency.constituency_name "
-                   "FROM Voter "
-                   f"JOIN Constituency ON Voter.constituency_id=Constituency.constituency_id WHERE gov_id='{gov_id}'"
-                   )
-
-    user = cursor.fetchone()
+    user = session.query(Voter, Constituency.constituency_name) \
+        .join(Constituency, Voter.constituency_id == Constituency.constituency_id) \
+        .filter(Voter.gov_id == gov_id) \
+        .first()
 
     if user is None:
         return jsonify({"message": "User not found"}), 404
 
-    return jsonify({'first_name': user[1],
-                    'last_name': user[2],
-                    'gov_id': user[3],
-                    'constituency_name': user[7],
-                    'email': user[6]})
+    voter, constituency_name = user
+
+    return jsonify({'first_name': voter.first_name,
+                    'last_name': voter.last_name,
+                    'gov_id': voter.gov_id,
+                    'constituency_name': constituency_name,
+                    'email': voter.email})
 
 
 @app.route("/api/v1.0/parties", methods=["GET"])
 def show_all_parties():
-    data_to_return = []
-    query = "SELECT * FROM Party"
-    cursor.execute(query)
-    for row in cursor.fetchall():
-        item_dict = {"party_id": row[0],
-                     "party_name": row[1],
-                     "image": row[2],
-                     "manifesto": row[3]}
-        data_to_return.append(item_dict)
-    return make_response(jsonify(data_to_return), 200)
+    parties = session.query(Party).all()
+
+    party_list = []
+    for party in parties:
+        item_dict = {"party_id": party.party_id,
+                     "party_name": party.party_name,
+                     "image": party.image,
+                     "manifesto": party.manifesto}
+        party_list.append(item_dict)
+    return make_response(jsonify(party_list), 200)
 
 
 @app.route("/api/v1.0/parties", methods=["POST"])
@@ -203,8 +205,7 @@ def add_party():
         im = request.form["image"]
         ma = request.form["manifesto"]
 
-        cursor.execute('SELECT * FROM Party WHERE party_name = ?', (pn,))
-        party = cursor.fetchone()
+        party = session.query(Party).filter_by(party_name=pn).first()
         if party:
             return make_response("Party already exists!", 403)
 
@@ -212,11 +213,17 @@ def add_party():
             return make_response("Please complete form", 404)
 
         else:
-            query = "INSERT INTO Party(party_name, image, manifesto) " \
-                    "VALUES(?, ?, ?)"
-            cursor.execute(query, [pn, im, ma])
+            new_party = Party(
+                party_name=pn,
+                image=im,
+                manifesto=ma
+            )
 
-    return make_response(jsonify(cursor.commit()), 201)
+            session.add(new_party)
+            session.commit()
+
+    return make_response(jsonify({"message": "Party created"}), 201)
+
 
 
 @app.route("/api/v1.0/parties/<id>", methods=["GET"])
@@ -242,8 +249,7 @@ def edit_party(id):
         im = request.form["image"]
         ma = request.form["manifesto"]
 
-        cursor.execute('SELECT * FROM Party WHERE party_name = ?', (pn,))
-        party = cursor.fetchone()
+        party = session.query(Party).filter_by(party_name=pn).first()
         if party:
             return make_response("Party already exists!", 403)
 
@@ -251,17 +257,29 @@ def edit_party(id):
             return make_response("Please complete form", 404)
 
         else:
-            query = 'UPDATE Party ' \
-                    'SET party_name, image, manifesto = ?, ?, ? ' \
-                    'WHERE party_id = ?'
-            cursor.execute(query, [pn, im, ma, id])
-            cursor.commit()
+            party = session.query(Party).filter_by(party_id=id).first()
+            if not party:
+                return make_response("Party not found", 404)
 
-    return make_response(jsonify(cursor.commit()), 201)
+            party.party_name = pn
+            party.image = im
+            party.manifesto = ma
+
+            session.commit()
+
+        return make_response(jsonify("Party updated"), 200)
 
 
-def delete_party():
-    return 0
+def delete_party(id):
+    party = session.query(Party).filter_by(party_id=id).first()
+
+    if not party:
+        return make_response("Party not found", 404)
+
+    session.delete(party)
+    session.commit()
+
+    return make_response(jsonify("Party deleted"), 200)
 
 
 @app.route("/api/v1.0/candidates/<id>", methods=["PUT"])
@@ -279,12 +297,20 @@ def edit_candidate(id):
         c_id = request.form["constituency_id"]
         rq = request.form["request"]
 
-        query = 'UPDATE Candidate ' \
-                'SET candidate_firstname, candidate_lastname, party_id, image, constituency_id, statement = ?, ?, ?, ?, ?, ?' \
-                'WHERE candidate_id = ?'
-        cursor.execute(query, [fn, ln, p_id, im, c_id, rq, id])
+        candidate = session.query(Candidate).filter_by(candidate_id=id).first()
+        if not candidate:
+            return make_response("Candidate not found", 404)
 
-    return make_response(jsonify(cursor.commit()), 201)
+        candidate.candidate_firstname = fn
+        candidate.candidate_lastname = ln
+        candidate.party_id = p_id
+        candidate.image = im
+        candidate.constituency_id = c_id
+        candidate.statement = rq
+
+        session.commit()
+
+    return make_response(jsonify("Candidate updated"), 200)
 
 
 @app.route("/api/v1.0/candidates", methods=["POST"])
@@ -302,50 +328,70 @@ def add_candidate():
         c_id = request.form["constituency_id"]
         st = request.form["statement"]
 
-        query = "INSERT INTO Candidate(candidate_firstname, candidate_lastname, party_id, image, constituency_id, statement) " \
-                "VALUES(?, ?, ?, ?, ?, ?)"
-        cursor.execute(query, [fn, ln, p_id, im, c_id, st])
+        new_candidate = Candidate(
+            candidate_firstname=fn,
+            candidate_lastname=ln,
+            party_id=p_id, image=im,
+            constituency_id=c_id,
+            statement=st)
 
-    return make_response(jsonify(cursor.commit()), 201)
+        session.add(new_candidate)
+        session.commit()
+
+    return make_response(jsonify("Candidate added"), 201)
 
 
-def delete_candidate():
-    return 0
+def delete_candidate(id):
+    candidate = session.query(Candidate).filter_by(candidate_id=id).first()
+
+    if not candidate:
+        return make_response("Candidate not found", 404)
+
+    session.delete(candidate)
+    session.commit()
+
+    return make_response(jsonify("Candidate deleted"), 200)
 
 
 @app.route("/api/v1.0/candidates", methods=["GET"])
 def show_all_candidates():
     data_to_return = []
-    query = "SELECT Candidate.*,Party.party_name " \
-            "FROM Candidate " \
-            "JOIN Party ON " \
-            "Candidate.party_id=party.party_id "
-    cursor.execute(query)
-    for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0],
-                     "candidate_firstname": row[1],
-                     "candidate_lastname": row[2],
-                     "party_id": row[3],
-                     "image": row[5],
-                     "statement": row[7],
-                     "party_name": row[8]}
+    query = session.query(Candidate, Party.party_name) \
+        .select_from(Candidate) \
+        .join(Party, Candidate.party_id == Party.party_id) \
+        .all()
+
+    for candidate, party_name in query:
+        item_dict = {
+            "candidate_id": candidate.candidate_id,
+            "candidate_firstname": candidate.candidate_firstname,
+            "candidate_lastname": candidate.candidate_lastname,
+            "party_id": candidate.party_id,
+            "image": candidate.image,
+            "statement": candidate.statement,
+            "party_name": party_name
+        }
         data_to_return.append(item_dict)
+
     return make_response(jsonify(data_to_return), 200)
 
 
 @app.route("/api/v1.0/voters", methods=["GET"])
 def show_all_voters():
+    voters = session.query(Voter).all()
+
     data_to_return = []
-    query = "SELECT * FROM Voter"
-    cursor.execute(query)
-    for row in cursor.fetchall():
-        item_dict = {"voter_id": row[0],
-                     "first_name": row[1],
-                     "last_name": row[2],
-                     "gov_id": row[3],
-                     "password": row[4],
-                     "email": row[6]}
+    for voter in voters:
+        item_dict = {
+            "voter_id": voter.voter_id,
+            "first_name": voter.first_name,
+            "last_name": voter.last_name,
+            "gov_id": voter.gov_id,
+            "password": voter.password,
+            "email": voter.email
+        }
         data_to_return.append(item_dict)
+
     return make_response(jsonify(data_to_return), 200)
 
 
@@ -376,17 +422,38 @@ def update_password(id):
     if "password" in request.form:
         pw = request.form["password"]
 
+        voter = session.query(Voter).get(id)
+
+        if not voter:
+            return make_response("Voter not found!", 404)
+
         if len(pw) < 8:
             return make_response("Password must be at least 8 characters!", 404)
-        else:
-            query = 'UPDATE Voter SET password = ? WHERE voter_id = ?'
-            cursor.execute(query, [pw, id])
-            cursor.commit()
 
-    return make_response("Password successfully updated!", 200)
+        voter.password = encrypt_password(pw)
+        session.commit()
+
+        return make_response("Password successfully updated!", 200)
+
+
+@app.route("/api/v1.0/voters/<id>", methods=["DELETE"])
+def delete_candidate(id):
+    user = session.query(Voter).filter_by(voter_id=id).first()
+
+    if not user:
+        return make_response("User not found", 404)
+
+    session.delete(user)
+    session.commit()
+
+    return make_response(jsonify("User deleted"), 200)
 
 
 ########## HELPER FUNCTIONS ##########
+
+def encrypt_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
 
 def gov_id_generator(n):
     range_start = 10 ** (n - 1)
@@ -426,29 +493,25 @@ def validate_postcode(postcode):
 
 
 def verify_otp(email, otp):
-    cursor.execute('SELECT * FROM Verification WHERE email = ? AND otp = ?', (email, otp))
-    temp_registration = cursor.fetchone()
+    temp_registration = session.query(Verification).filter_by(email=email, otp=otp).first()
     if temp_registration:
         return True
     return False
 
 
 def user_exists(email):
-    cursor.execute('SELECT * FROM Voter WHERE email = ?', (email,))
-    user = cursor.fetchone()
+    user = session.query(Voter).filter_by(email=email).first()
     if user:
         return True
     return False
 
 
 def get_user_by_gov_id(gov_id):
-    cursor.execute(f"SELECT * FROM Voter WHERE gov_id='{gov_id}'")
-    return cursor.fetchone()
+    return session.query(Voter).filter_by(gov_id=gov_id).first()
 
 
 def get_user_by_email(email):
-    cursor.execute(f"SELECT * FROM Voter WHERE email='{email}'")
-    return cursor.fetchone()
+    return session.query(Voter).filter_by(email=email).first()
 
 
 def check_password(password, hashed_password):
