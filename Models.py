@@ -1,7 +1,5 @@
-from decouple import config
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
 
 from DBConfig import DBConfig
 
@@ -26,6 +24,9 @@ class Voter(Base):
     constituency_id = Column(Integer, ForeignKey('Constituency.constituency_id'), nullable=False)
     email = Column(String, unique=True, nullable=False)
 
+    def get_password(self):
+        return self.password
+
 
 class Constituency(Base):
     __tablename__ = 'Constituency'
@@ -40,3 +41,24 @@ class Verification(Base):
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
     otp = Column(String, unique=True, nullable=False)
+
+class Party(Base):
+    __tablename__ = 'Party'
+
+    party_id = Column(Integer, primary_key=True)
+    party_name = Column(String, unique=True, nullable=False)
+    image = Column(String, unique=False, nullable=False)
+    manifesto = Column(String, unique=False, nullable=False)
+
+
+class Candidate(Base):
+    __tablename__ = 'Candidate'
+
+    candidate_id = Column(Integer, primary_key=True)
+    candidate_firstname = Column(String, unique=False, nullable=False)
+    candidate_lastname = Column(String, unique=False, nullable=False)
+    party_id = Column(Integer, unique=False, nullable=False)
+    vote_count = Column(Integer, unique=False, nullable=True)
+    image = Column(String, unique=False, nullable=False)
+    constituency_id = Column(Integer, unique=False, nullable=True)
+    statement = Column(String, unique=False, nullable=False)
