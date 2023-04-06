@@ -1,12 +1,25 @@
-<!-- login.component.html -->
-<form (submit)="onSubmit()">
-  <label>
-    Gov ID:
-    <input [(ngModel)]="gov_id" name="gov_id" required />
-  </label>
-  <label>
-    Password:
-    <input [(ngModel)]="password" name="password" type="password" required />
-  </label>
-  <button type="submit">Login</button>
-</form>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="login.component.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Log In</h2>
+    <form (submit)="onSubmit()">
+      <div class="form-group">
+        <label>Government ID:</label>
+        <input class="form-control" [(ngModel)]="gov_id" name="gov_id" placeholder="ID" required />
+      </div>
+      <div class="form-group">
+        <label>Password:</label>
+        <input class="form-control" [(ngModel)]="password" name="password" type="password" placeholder="Password" required />
+      </div>
+      <button type="submit" class="btn btn-secondary">Login</button>
+    </form>
+  </div>
+</body>
+

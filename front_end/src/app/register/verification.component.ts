@@ -7,6 +7,7 @@ import { EmailService } from '../email.service';
 @Component({
   selector: 'verification',
   templateUrl: 'verification.component.html',
+  styleUrls: ['./verification.component.css']
 })
 export class VerificationComponent {
   email: any;
