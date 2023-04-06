@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 from DBConfig import DBConfig
 
@@ -23,6 +24,8 @@ class Voter(Base):
     password = Column(String, nullable=False)
     constituency_id = Column(Integer, ForeignKey('Constituency.constituency_id'), nullable=False)
     email = Column(String, unique=True, nullable=False)
+
+    votes = relationship("Votes", back_populates="voter")
 
     def get_password(self):
         return self.password
@@ -62,3 +65,17 @@ class Candidate(Base):
     image = Column(String, unique=False, nullable=False)
     constituency_id = Column(Integer, unique=False, nullable=True)
     statement = Column(String, unique=False, nullable=False)
+
+    votes = relationship("Votes", back_populates="candidate")
+
+
+class Votes(Base):
+    __tablename__ = 'Votes'
+
+    vote_id = Column(Integer, primary_key=True)
+    voter_id = Column(Integer, ForeignKey('Voter.voter_id'), nullable=False)
+    candidate_id = Column(Integer, ForeignKey('Candidate.candidate_id'), nullable=False)
+
+    # Relationships
+    voter = relationship("Voter", back_populates="votes")
+    candidate = relationship("Candidate", back_populates="votes")
