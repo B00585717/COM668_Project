@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify, make_response, json
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from DBConfig import DBConfig
 from flask_cors import CORS
-from Models import Voter, Verification, Party, Candidate, engine, Constituency
+from Models import Voter, Verification, Party, Candidate, engine, Constituency, Votes
 
 app = Flask(__name__)
 app.secret_key = config('SK')
@@ -152,8 +152,18 @@ def login():
     if user:
         if check_password(password, user.get_password()):
             access_token = create_access_token(identity=gov_id)
+
+            user_data = {
+                'voter_id': user.voter_id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'gov_id': user.gov_id,
+                'email': user.email,
+                'constituency_id': user.constituency_id
+            }
+
             # Return access token
-            return jsonify({'access_token': access_token})
+            return jsonify({'access_token': access_token, 'user_data': user_data})
         else:
             return jsonify({'message': 'Incorrect password.'}), 401
     else:
@@ -466,10 +476,78 @@ def delete_voter(g_id):
     return make_response('User deleted', 200)
 
 
+@app.route("/api/v1.0/votes", methods=["POST"])
+def submit_vote():
+    if "voter_id" in request.json and "candidate_id" in request.json:
+        voter_id = request.json["voter_id"]
+        candidate_id = request.json["candidate_id"]
+
+        # Check if the user has already voted
+        existing_vote = session.query(Votes).filter_by(voter_id=voter_id).first()
+        if existing_vote:
+            return make_response(jsonify({"message": "User has already voted"}), 403)
+
+        # Check if the candidate exists
+        candidate = session.query(Candidate).filter_by(candidate_id=candidate_id).first()
+        if not candidate:
+            return make_response(jsonify({"message": "Candidate not found"}), 404)
+
+        # Create a new Vote object and store it in the database
+        new_vote = Votes(voter_id=voter_id, candidate_id=candidate_id)
+        session.add(new_vote)
+
+        candidate.vote_count = get_vote_count(candidate_id) if candidate.vote_count else 1
+
+        session.commit()
+
+        return make_response(jsonify({"message": "Vote submitted", "vote_id": new_vote.vote_id}), 201)
+    else:
+        print("Invalid request:", request.json)
+        return make_response(jsonify({"message": "Invalid request"}), 400)
+
+
+@app.route("/api/v1.0/votes/<vote_id>", methods=["DELETE"])
+def delete_vote(vote_id):
+    vote = session.query(Votes).filter_by(vote_id=vote_id).first()
+    if vote:
+        candidate_id = vote.candidate_id
+        session.delete(vote)
+        session.commit()
+
+        # Update the vote count for the candidate
+        vote_count = get_vote_count(candidate_id)
+        candidate = session.query(Candidate).filter_by(candidate_id=candidate_id).first()
+        if candidate:
+            candidate.vote_count = vote_count
+            session.commit()
+
+        return make_response(jsonify({"message": "Vote deleted", "vote_id": vote_id}), 200)
+    else:
+        return make_response(jsonify({"message": "Vote not found"}), 404)
+
+
+@app.route("/api/v1.0/votes", methods=["DELETE"])
+def reset_election():
+    # Delete all vote entries
+    session.query(Votes).delete()
+    session.commit()
+
+    # Update the vote_count for all candidates
+    candidates = session.query(Candidate).all()
+    for candidate in candidates:
+        candidate.vote_count = 0
+        session.commit()
+
+    return make_response(jsonify({"message": "Election Reset"}), 200)
+
 ########## HELPER FUNCTIONS ##########
 
 def encrypt_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+
+def get_vote_count(candidate_id):
+    return session.query(Votes).filter_by(candidate_id=candidate_id).count()
 
 
 def gov_id_generator(n):
