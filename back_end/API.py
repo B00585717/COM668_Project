@@ -320,11 +320,10 @@ def show_all_candidates():
 @app.route("/api/v1.0/candidates/<id>", methods=["GET"])
 def show_one_candidate(id):
     data_to_return = []
-    query = "SELECT Candidate.*,Party.party_name, Party.image " \
+    query = "SELECT Candidate.*,Party.party_name, Party.image, Constituency.constituency_name " \
             "FROM Candidate " \
             "JOIN Party ON " \
-            "Candidate.party_id=party.party_id " \
-            "WHERE candidate_id = ?"
+            "Candidate.party_id=party.party_id JOIN Constituency ON Candidate.constituency_id = Constituency.constituency_id WHERE candidate_id = ?"
     cursor.execute(query, id)
     for row in cursor.fetchall():
         item_dict = {"candidate_id": row[0],
@@ -334,7 +333,8 @@ def show_one_candidate(id):
                      "image": row[5],
                      "statement": row[7],
                      "party_name": row[8],
-                     "party_image": row[9]}
+                     "party_image": row[9],
+                     "constituency_name": row[10]}
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
