@@ -94,6 +94,7 @@ def register():
 
             session.query(Verification).filter_by(email=email, otp=otp).delete()
             session.commit()
+            send_gov_id(email, gov_id)
 
             return make_response(jsonify({"message": "Success", "gov_id": new_voter.gov_id}), 201)
 
@@ -446,19 +447,27 @@ def show_all_voters():
 
 @app.route("/api/v1.0/profile/<g_id>", methods=["PUT"])
 def update_password(g_id):
-    if "password" in request.form:
+    if "password" in request.form\
+            and "email" in request.form:
         pw = request.form["password"]
+        email = request.form["email"]
 
         voter = session.query(Voter).filter_by(gov_id=g_id).first()
 
         if not voter:
             return make_response("User not found!", 404)
 
+        if voter.email != email:
+            return jsonify({"error": "Email address does not match!"}), 400
+
         if len(pw) < 8:
             return make_response("Password must be at least 8 characters!", 404)
 
         voter.password = encrypt_password(pw)
         session.commit()
+
+        GoogleAPI.send_message(GoogleAPI.service, email, "Password Change", "Hi, your password has been changed on "
+                                                                            "the Online Election System")
 
         return jsonify({"message": "Password successfully updated!"}), 200
     else:
@@ -617,6 +626,12 @@ def check_password(password, hashed_password):
 
 def send_otp(email, otp):
     email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your OTP", f"Your OTP is: {otp}")
+    if not email_sent:
+        return make_response("Failed to send email", 500)
+
+
+def send_gov_id(email, gov_id):
+    email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your Government ID", f"Your Government ID is: {gov_id}")
     if not email_sent:
         return make_response("Failed to send email", 500)
 

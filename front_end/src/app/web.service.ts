@@ -72,9 +72,10 @@ constructor(private http: HttpClient) {}
     return this.http.put('http://localhost:5000/api/v1.0/candidates/'+ this.candidateId, formData);
   }
 
-  updatePassword(g_id: string, newPassword: string) {
+  updatePassword(g_id: string,email: string, newPassword: string) {
     const formData = new FormData();
     formData.append('password', newPassword);
+    formData.append('email', email)
     return this.http.put("http://localhost:5000/api/v1.0/profile/"+ g_id , formData);
   }
 
