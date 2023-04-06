@@ -434,15 +434,15 @@ def show_all_voters():
     return make_response(jsonify(data_to_return), 200)
 
 
-@app.route("/api/v1.0/voters/<id>", methods=["PUT"])
-def update_password(id):
+@app.route("/api/v1.0/profile/<g_id>", methods=["PUT"])
+def update_password(g_id):
     if "password" in request.form:
         pw = request.form["password"]
 
-        voter = session.query(Voter).get(id)
+        voter = session.query(Voter).filter_by(gov_id=g_id).first()
 
         if not voter:
-            return make_response("Voter not found!", 404)
+            return make_response("User not found!", 404)
 
         if len(pw) < 8:
             return make_response("Password must be at least 8 characters!", 404)
@@ -453,9 +453,9 @@ def update_password(id):
         return make_response("Password successfully updated!", 200)
 
 
-@app.route("/api/v1.0/voters/<id>", methods=["DELETE"])
-def delete_voter(id):
-    user = session.query(Voter).filter_by(voter_id=id).first()
+@app.route("/api/v1.0/profile/<g_id>", methods=["DELETE"])
+def delete_voter(g_id):
+    user = session.query(Voter).filter_by(gov_id=g_id).first()
 
     if not user:
         return make_response("User not found", 404)
@@ -463,7 +463,7 @@ def delete_voter(id):
     session.delete(user)
     session.commit()
 
-    return make_response('Candidate deleted', 200)
+    return make_response('User deleted', 200)
 
 
 ########## HELPER FUNCTIONS ##########
