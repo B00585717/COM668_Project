@@ -21,7 +21,6 @@ export class VerificationComponent {
   });
   }
 sendOtp() {
-  console.log('Sending OTP request with data:', { email: this.email });
   this.http
       .post('http://localhost:5000/api/v1.0/verification', { email: this.email })
       .subscribe(

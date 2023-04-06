@@ -72,9 +72,10 @@ constructor(private http: HttpClient) {}
     return this.http.put('http://localhost:5000/api/v1.0/candidates/'+ this.candidateId, formData);
   }
 
-  updatePassword(voter: any){
-    let formData = this.updatePasswordForm(voter);
-    return this.http.put('http://localhost:5000/api/v1.0/voters/'+ this.voterId, formData);
+  updatePassword(g_id: string, newPassword: string) {
+    const formData = new FormData();
+    formData.append('password', newPassword);
+    return this.http.put("http://localhost:5000/api/v1.0/profile/"+ g_id , formData);
   }
 
   private voterForm(voter: any) {
@@ -98,16 +99,6 @@ constructor(private http: HttpClient) {}
 
     return formData;
 }
-
-  private updatePasswordForm(voter: any) {
-
-    let formData = new FormData();
-    formData.append("password", voter.password);
-
-    return formData;
-  }
-
-
 
   private candidateForm(candidate: any) {
 

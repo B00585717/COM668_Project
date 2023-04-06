@@ -21,6 +21,7 @@ import {LogoutComponent} from "./logout/logout.component";
 import {VerificationComponent} from "./register/verification.component"
 import { AuthService } from './auth.service';
 import {NavComponent} from "./nav/nav.component";
+import {Password_changeComponent} from "./profile/password_change.component";
 
 
 var routes: any = [
@@ -63,6 +64,10 @@ var routes: any = [
   {
     path: 'logout',
     component: LogoutComponent
+  },
+  {
+    path: 'profile/:g_id',
+    component: Password_changeComponent
   }
 
   ]
@@ -81,7 +86,8 @@ var routes: any = [
     ProfileComponent,
     LogoutComponent,
     VerificationComponent,
-    NavComponent
+    NavComponent,
+    Password_changeComponent
   ],
   imports: [
     BrowserModule,

@@ -19,10 +19,9 @@ export class LoginComponent {
     this.webService.login({ gov_id: this.gov_id, password: this.password }).subscribe(
       (response: any) => {
         console.log('Login successful');
-        const accessToken = response.access_token;
         const loggedInUserData = response.user_data;
-        localStorage.setItem('access_token', response.access_token);
-        this.authService.setLoggedIn(true); // Add this line
+        sessionStorage.setItem('access_token', response.access_token);
+        this.authService.setLoggedIn(true);
         this.router.navigate(['/profile']);
         this.authService.setUser(loggedInUserData);
       },

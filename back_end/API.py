@@ -460,7 +460,9 @@ def update_password(g_id):
         voter.password = encrypt_password(pw)
         session.commit()
 
-        return make_response("Password successfully updated!", 200)
+        return jsonify({"message": "Password successfully updated!"}), 200
+    else:
+        return jsonify({"message": "Password field is missing in the request."}), 400
 
 
 @app.route("/api/v1.0/profile/<g_id>", methods=["DELETE"])
