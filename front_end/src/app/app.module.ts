@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {HomeComponent} from './home/home.component';
@@ -19,6 +19,8 @@ import {NgxCaptchaModule} from "ngx-captcha";
 import {FormsModule} from '@angular/forms';
 import {LogoutComponent} from "./logout/logout.component";
 import {VerificationComponent} from "./register/verification.component"
+import { AuthService } from './auth.service';
+import {NavComponent} from "./nav/nav.component";
 
 
 var routes: any = [
@@ -78,7 +80,8 @@ var routes: any = [
     PartiesComponent,
     ProfileComponent,
     LogoutComponent,
-    VerificationComponent
+    VerificationComponent,
+    NavComponent
   ],
   imports: [
     BrowserModule,
@@ -87,9 +90,10 @@ var routes: any = [
     RouterModule.forRoot(routes),
     ReactiveFormsModule,
     NgxCaptchaModule,
-    FormsModule
+    FormsModule,
+    CommonModule
   ],
-  providers: [WebService],
+  providers: [WebService, AuthService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

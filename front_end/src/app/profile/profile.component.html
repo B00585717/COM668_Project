@@ -1,10 +1,61 @@
-<div *ngIf="profile; else elseBlock">
-  <h2>Profile</h2>
-  <p>First Name: {{ profile.first_name }}</p>
-  <p>Last Name: {{ profile.last_name }}</p>
-  <p>Government ID: {{ profile.gov_id }}</p>
-  <p>Constituency: {{ profile.constituency_name }}</p>
-  <p>Email: {{ profile.email }}</p>
-</div>
-
-<ng-template #elseBlock>Content to render when condition is false.</ng-template>
+<section style="background-color: #eee;">
+  <div class="container py-5" style="height: 810px; margin-left: 400px">
+    <div class="col-md-8">
+      <div class="tab-content profile-tab" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab"
+             *ngIf="profile; else elseBlock">
+          <div class="row">
+            <h2>Profile</h2>
+            <div class="col-md-6">
+              <label>First Name:</label>
+            </div>
+            <div class="col-md-6">
+              <p>{{profile.first_name}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Last Name</label>
+            </div>
+            <div class="col-md-6">
+              <p>{{profile.last_name}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Email</label>
+            </div>
+            <div class="col-md-6">
+              <p>{{profile.email}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Government ID:</label>
+            </div>
+            <div class="col-md-6">
+              <p>{{profile.gov_id}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Constituency</label>
+            </div>
+            <div class="col-md-6">
+              <p>{{profile.constituency_name}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <label>Password</label>
+            </div>
+            <div class="col-md-6">
+              <button>Change Password</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #elseBlock>Must Login to View Profile</ng-template>
+    </div>
+  </div>
+</section>

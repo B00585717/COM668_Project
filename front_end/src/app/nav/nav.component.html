@@ -14,9 +14,24 @@
       <li class="nav-item">
         <a class="nav-link" routerLink='/candidates'>Candidates</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink='/profile'>Profile</a>
+      </li>
+      <li *ngIf="!isLoggedIn" class="nav-item" style="margin-left: 800px">
+        <div class="form-inline ">
+          <button class="btn btn-secondary" routerLink='/verification'>Register</button>
+        </div>
+      </li>
+      <li *ngIf="!isLoggedIn" class="nav-item" style="margin-left: 10px">
+        <div class="form-inline ">
+          <button class="btn btn-secondary" routerLink='/login'>Login</button>
+        </div>
+      </li>
+      <li *ngIf="isLoggedIn" class="nav-item" style="margin-left: 800px">
+        <div class="form-inline ">
+          <button class="btn btn-secondary" (click)="logout()">Logout</button>
+        </div>
+      </li>
     </ul>
   </div>
 </nav>
-
-
-
