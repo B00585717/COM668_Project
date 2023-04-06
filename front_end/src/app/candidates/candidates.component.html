@@ -14,6 +14,7 @@
 
                 <a class="card-text" routerLink="/parties/{{candidate.party_id}}">{{candidate.party_name}}</a>
                 <p class="card-text">{{candidate.statement}}</p>
+                  <button (click)="onVoteButtonClick(candidate.candidate_id)">Vote for candidate</button>
                     </div>
               </div>
             </div>
