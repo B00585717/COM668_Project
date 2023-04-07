@@ -19,8 +19,7 @@ export class CandidatesComponent {
   voter_id: any;
 
   constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder, private voteService: VoteService, private authService: AuthService) {
-    const user = this.authService.getUser();
-    this.voter_id = user ? user.voter_id : null;
+
   }
 
   onVoteButtonClick(candidate_id: number) {
@@ -34,7 +33,15 @@ export class CandidatesComponent {
 
   ngOnInit() {
     this.candidate_list = this.webService.getCandidates();
-    this.voter_id = this.authService.getUser().voter_id;
+
+    this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
+      if (isLoggedIn) {
+        const user = this.authService.getUser();
+        this.voter_id = user ? user.voter_id : null;
+      } else {
+        this.voter_id = null;
+      }
+    });
   }
 
   onSubmit() {

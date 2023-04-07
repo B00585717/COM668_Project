@@ -1,21 +1,28 @@
-<div class="container" style="margin-top:120px;">
-  <div class="row">
-    <div class="col">
-      <div *ngFor="let party of party_list | async">
-        <div class="card mb-3" style="max-width: 1000px;">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div class="container">
+    <h1 style="padding: 10px">Parties</h1>
+    <div class="row">
+      <div class="col-md-6" *ngFor="let party of party_list | async">
+        <div class="card mb-3">
           <div class="row g-0">
             <div class="col-md-4">
-              <img src="{{party.image}}" class="img-fluid rounded-start" alt="..." style="cursor: pointer" [routerLink]="['/parties/'+ party.party_id]">
+              <img src="{{ party.image }}" alt="Profile Picture" class="img-fluid" [routerLink]="['/parties/'+ party.party_id]" style="cursor: pointer">
             </div>
             <div class="col-md-8">
               <div class="card-body">
-                <h5 class="card-title">{{party.party_name}}</h5>
-                <p class="card-text">{{party.manifesto}}</p>
+                <h5 class="card-title">{{ party.party_name }}</h5>
+                <p class="card-text">{{ party.manifesto }}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div> <!-- col -->
-  </div> <!-- row -->
-</div> <!-- container -->
+    </div>
+  </div>
+</body>
+</html>
