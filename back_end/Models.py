@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, ForeignKey, create_engine, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 
 from DBConfig import DBConfig
 
@@ -24,11 +24,16 @@ class Voter(Base):
     password = Column(String, nullable=False)
     constituency_id = Column(Integer, ForeignKey('Constituency.constituency_id'), nullable=False)
     email = Column(String, unique=True, nullable=False)
+    isAdmin = Column(Boolean, default=False)
 
     votes = relationship("Votes", back_populates="voter")
 
     def get_password(self):
         return self.password
+
+    @classmethod
+    def get_gov_id(cls, gov_id: int, session: Session):
+        return session.query(cls).filter_by(gov_id=gov_id).first()
 
 
 class Constituency(Base):

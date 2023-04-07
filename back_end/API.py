@@ -1,5 +1,7 @@
 import random
 import re
+from functools import wraps
+
 from sqlalchemy.orm import sessionmaker
 import GoogleAPI
 import bcrypt
@@ -191,6 +193,18 @@ def profile():
                     'gov_id': voter.gov_id,
                     'constituency_name': constituency_name,
                     'email': voter.email})
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = get_user_from_request()
+        if user is None or not user.isAdmin:
+            response = jsonify({'error': 'Admin access required'})
+            response.status_code = 403  # Forbidden
+            return response
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @app.route("/api/v1.0/parties", methods=["GET"])
@@ -408,7 +422,8 @@ def add_candidate():
             session.add(new_candidate)
             session.commit()
 
-            return make_response(jsonify({"message": "Candidate added", "candidate_id": new_candidate.candidate_id}), 201)
+            return make_response(jsonify({"message": "Candidate added", "candidate_id": new_candidate.candidate_id}),
+                                 201)
     else:
         return make_response("Invalid request", 400)
 
@@ -447,7 +462,7 @@ def show_all_voters():
 
 @app.route("/api/v1.0/profile/<g_id>", methods=["PUT"])
 def update_password(g_id):
-    if "password" in request.form\
+    if "password" in request.form \
             and "email" in request.form:
         pw = request.form["password"]
         email = request.form["email"]
@@ -551,6 +566,7 @@ def reset_election():
 
     return make_response(jsonify({"message": "Election Reset"}), 200)
 
+
 ########## HELPER FUNCTIONS ##########
 
 def encrypt_password(password):
@@ -631,9 +647,20 @@ def send_otp(email, otp):
 
 
 def send_gov_id(email, gov_id):
-    email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your Government ID", f"Your Government ID is: {gov_id}")
+    email_sent = GoogleAPI.send_message(GoogleAPI.service, email, "Your Government ID",
+                                        f"Your Government ID is: {gov_id}")
     if not email_sent:
         return make_response("Failed to send email", 500)
+
+
+@jwt_required()
+def get_user_from_request():
+    gov_id = get_jwt_identity()
+
+    # Assuming your Voter model has a "get_by_id" method
+    # Replace with the appropriate method to get the user by ID in your model
+    user = Voter.get_gov_id(gov_id, session)
+    return user
 
 
 if __name__ == "__main__":
