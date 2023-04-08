@@ -209,16 +209,20 @@ def admin_required(f):
 
 @app.route("/api/v1.0/parties", methods=["GET"])
 def show_all_parties():
-    parties = session.query(Party).all()
+    session = Session()
+    try:
+        parties = session.query(Party).all()
 
-    party_list = []
-    for party in parties:
-        item_dict = {"party_id": party.party_id,
-                     "party_name": party.party_name,
-                     "image": party.image,
-                     "manifesto": party.manifesto}
-        party_list.append(item_dict)
-    return make_response(jsonify(party_list), 200)
+        party_list = []
+        for party in parties:
+            item_dict = {"party_id": party.party_id,
+                         "party_name": party.party_name,
+                         "image": party.image,
+                         "manifesto": party.manifesto}
+            party_list.append(item_dict)
+        return make_response(jsonify(party_list), 200)
+    finally:
+        session.close()
 
 
 @app.route("/api/v1.0/parties/<id>", methods=["GET"])
@@ -314,25 +318,29 @@ def delete_party(id):
 
 @app.route("/api/v1.0/candidates", methods=["GET"])
 def show_all_candidates():
-    data_to_return = []
-    query = session.query(Candidate, Party.party_name) \
-        .select_from(Candidate) \
-        .join(Party, Candidate.party_id == Party.party_id) \
-        .all()
+    session = Session()
+    try:
+        data_to_return = []
+        query = session.query(Candidate, Party.party_name) \
+            .select_from(Candidate) \
+            .join(Party, Candidate.party_id == Party.party_id) \
+            .all()
 
-    for candidate, party_name in query:
-        item_dict = {
-            "candidate_id": candidate.candidate_id,
-            "candidate_firstname": candidate.candidate_firstname,
-            "candidate_lastname": candidate.candidate_lastname,
-            "party_id": candidate.party_id,
-            "image": candidate.image,
-            "statement": candidate.statement,
-            "party_name": party_name
-        }
-        data_to_return.append(item_dict)
+        for candidate, party_name in query:
+            item_dict = {
+                "candidate_id": candidate.candidate_id,
+                "candidate_firstname": candidate.candidate_firstname,
+                "candidate_lastname": candidate.candidate_lastname,
+                "party_id": candidate.party_id,
+                "image": candidate.image,
+                "statement": candidate.statement,
+                "party_name": party_name
+            }
+            data_to_return.append(item_dict)
 
-    return make_response(jsonify(data_to_return), 200)
+        return make_response(jsonify(data_to_return), 200)
+    finally:
+        session.close()
 
 
 @app.route("/api/v1.0/candidates/<id>", methods=["GET"])
@@ -448,23 +456,26 @@ def delete_candidate(id):
 
 
 @app.route("/api/v1.0/voters", methods=["GET"])
-@admin_required
 def show_all_voters():
-    voters = session.query(Voter).all()
+    session = Session()
+    try:
+        voters = session.query(Voter).all()
 
-    data_to_return = []
-    for voter in voters:
-        item_dict = {
-            "voter_id": voter.voter_id,
-            "first_name": voter.first_name,
-            "last_name": voter.last_name,
-            "gov_id": voter.gov_id,
-            "password": voter.password,
-            "email": voter.email
-        }
-        data_to_return.append(item_dict)
+        data_to_return = []
+        for voter in voters:
+            item_dict = {
+                "voter_id": voter.voter_id,
+                "first_name": voter.first_name,
+                "last_name": voter.last_name,
+                "gov_id": voter.gov_id,
+                "password": voter.password,
+                "email": voter.email
+            }
+            data_to_return.append(item_dict)
 
-    return make_response(jsonify(data_to_return), 200)
+        return make_response(jsonify(data_to_return), 200)
+    finally:
+        session.close()
 
 
 @app.route("/api/v1.0/profile/<g_id>", methods=["PUT"])
@@ -512,7 +523,7 @@ def delete_voter(g_id):
 
 
 @app.route("/api/v1.0/votes", methods=["POST"])
-@admin_required
+@jwt_required()
 def submit_vote():
     if "voter_id" in request.json and "candidate_id" in request.json:
         voter_id = request.json["voter_id"]
