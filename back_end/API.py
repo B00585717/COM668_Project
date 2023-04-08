@@ -200,7 +200,7 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         user = get_user_from_request()
         if user is None or not user.isAdmin:
-            response = jsonify({'error': 'Admin access required'})
+            response = jsonify({'message': 'Admin access required'})
             response.status_code = 403  # Forbidden
             return response
         return f(*args, **kwargs)
@@ -236,6 +236,7 @@ def show_one_party(id):
 
 
 @app.route("/api/v1.0/parties", methods=["POST"])
+@admin_required
 def add_party():
     if "party_name" in request.form \
             and "image" in request.form \
@@ -265,6 +266,7 @@ def add_party():
 
 
 @app.route("/api/v1.0/parties/<id>", methods=["PUT"])
+@admin_required
 def edit_party(id):
     if "party_name" in request.form \
             and "image" in request.form \
@@ -297,6 +299,7 @@ def edit_party(id):
 
 
 @app.route("/api/v1.0/parties/<id>", methods=["DELETE"])
+@admin_required
 def delete_party(id):
     party = session.query(Party).filter_by(party_id=id).first()
 
@@ -355,6 +358,7 @@ def show_one_candidate(id):
 
 
 @app.route("/api/v1.0/candidates/<id>", methods=["PUT"])
+@admin_required
 def edit_candidate(id):
     if "candidate_firstname" in request.form \
             and "candidate_lastname" in request.form \
@@ -389,6 +393,7 @@ def edit_candidate(id):
 
 
 @app.route("/api/v1.0/candidates", methods=["POST"])
+@admin_required
 def add_candidate():
     if "candidate_firstname" in request.form \
             and "candidate_lastname" in request.form \
@@ -429,6 +434,7 @@ def add_candidate():
 
 
 @app.route("/api/v1.0/candidates/<id>", methods=["DELETE"])
+@admin_required
 def delete_candidate(id):
     candidate = session.query(Candidate).filter_by(candidate_id=id).first()
 
@@ -442,6 +448,7 @@ def delete_candidate(id):
 
 
 @app.route("/api/v1.0/voters", methods=["GET"])
+@admin_required
 def show_all_voters():
     voters = session.query(Voter).all()
 
@@ -461,6 +468,7 @@ def show_all_voters():
 
 
 @app.route("/api/v1.0/profile/<g_id>", methods=["PUT"])
+@jwt_required()
 def update_password(g_id):
     if "password" in request.form \
             and "email" in request.form:
@@ -490,6 +498,7 @@ def update_password(g_id):
 
 
 @app.route("/api/v1.0/profile/<g_id>", methods=["DELETE"])
+@admin_required
 def delete_voter(g_id):
     user = session.query(Voter).filter_by(gov_id=g_id).first()
 
@@ -503,6 +512,7 @@ def delete_voter(g_id):
 
 
 @app.route("/api/v1.0/votes", methods=["POST"])
+@admin_required
 def submit_vote():
     if "voter_id" in request.json and "candidate_id" in request.json:
         voter_id = request.json["voter_id"]
@@ -533,6 +543,7 @@ def submit_vote():
 
 
 @app.route("/api/v1.0/votes/<vote_id>", methods=["DELETE"])
+@admin_required
 def delete_vote(vote_id):
     vote = session.query(Votes).filter_by(vote_id=vote_id).first()
     if vote:
@@ -553,6 +564,7 @@ def delete_vote(vote_id):
 
 
 @app.route("/api/v1.0/votes", methods=["DELETE"])
+@admin_required
 def reset_election():
     # Delete all vote entries
     session.query(Votes).delete()
@@ -565,6 +577,19 @@ def reset_election():
         session.commit()
 
     return make_response(jsonify({"message": "Election Reset"}), 200)
+
+
+@app.route("/api/v1.0/profile/<gov_id>/make_admin", methods=["PATCH"])
+@jwt_required()
+@admin_required
+def make_user_admin(gov_id):
+    user = Voter.get_gov_id(gov_id, session)
+    if not user:
+        return make_response(jsonify({"message": "User not found"}), 404)
+
+    user.isAdmin = True
+    session.commit()
+    return make_response(jsonify({"message": "User is now an admin"}), 200)
 
 
 ########## HELPER FUNCTIONS ##########
