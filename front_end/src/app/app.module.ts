@@ -22,6 +22,7 @@ import {VerificationComponent} from "./register/verification.component"
 import { AuthService } from './auth.service';
 import {NavComponent} from "./nav/nav.component";
 import {Password_changeComponent} from "./profile/password_change.component";
+import {AdminComponent} from "./admin/admin.component";
 
 
 var routes: any = [
@@ -68,6 +69,10 @@ var routes: any = [
   {
     path: 'profile/:g_id',
     component: Password_changeComponent
+  },
+  {
+    path: 'admin',
+    component: AdminComponent
   }
 
   ]
@@ -87,7 +92,8 @@ var routes: any = [
     LogoutComponent,
     VerificationComponent,
     NavComponent,
-    Password_changeComponent
+    Password_changeComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,92 @@
+ <div class="container">
+    <h1 style="padding: 10px">Candidates</h1>
+    <div class="row">
+      <div class="col-md-6" *ngFor="let candidate of candidate_list | async">
+        <div class="card mb-3">
+           <div class="row align-items-start">
+            <div class="col">
+              <div class="row g-0">
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ candidate.candidate_firstname }} {{candidate.candidate_lastname}}</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="row g-0" style="justify-content: right">
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px">Edit</button>
+                    <button type="button" class="btn btn-danger">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ <div class="container">
+    <h1 style="padding: 10px">Parties</h1>
+    <div class="row">
+      <div class="col-md-6" *ngFor="let party of party_list | async">
+        <div class="card mb-3">
+           <div class="row align-items-start">
+            <div class="col">
+              <div class="row g-0">
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ party.party_name }}</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="row g-0" style="justify-content: right">
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px">Edit</button>
+                    <button type="button" class="btn btn-danger" >Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ <div class="container">
+    <h1 style="padding: 10px">Users</h1>
+    <div class="row">
+      <div class="col-md-6" *ngFor="let party of voter_list | async">
+        <div class="card mb-3">
+           <div class="row align-items-start">
+            <div class="col">
+              <div class="row g-0">
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ party.first_name }}</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="row g-0" style="justify-content: right">
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px">Edit</button>
+                    <button type="button" class="btn btn-danger" >Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+

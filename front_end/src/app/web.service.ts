@@ -79,6 +79,11 @@ constructor(private http: HttpClient) {}
     return this.http.put("http://localhost:5000/api/v1.0/profile/"+ g_id , formData);
   }
 
+
+  getUsers() {
+    return this.http.get('http://localhost:5000/api/v1.0/voters');
+  }
+
   private voterForm(voter: any) {
 
     let formData = new FormData();
