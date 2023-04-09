@@ -67,9 +67,9 @@ constructor(private http: HttpClient) {}
   }
 
 
-  updateCandidate(candidate: any){
+  updateCandidate(candidate: any) {
     let formData = this.candidateForm(candidate);
-    return this.http.put('http://localhost:5000/api/v1.0/candidates/'+ this.candidateId, formData);
+    return this.http.put('http://localhost:5000/api/v1.0/candidates/' + candidate.candidate_id, formData);
   }
 
   updatePassword(g_id: string,email: string, newPassword: string) {

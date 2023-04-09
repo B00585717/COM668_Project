@@ -9,6 +9,36 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <h5 class="card-title">{{ candidate.candidate_firstname }} {{candidate.candidate_lastname}}</h5>
+                    <div *ngIf="candidate.showForm">
+                    <form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value, candidate)">
+                      <div class="form-group">
+                        <label for="candidate_firstname">First Name:</label>
+                        <input id="candidate_firstname" name="candidate_firstname" placeholder="First Name" required formControlName="candidate_firstname" />
+                      </div>
+                      <div class="form-group">
+                        <label for="candidate_lastname">Last Name:</label>
+                        <input class="form-control"  id="candidate_lastname" name="candidate_lastname" placeholder="Last Name" required formControlName="candidate_lastname"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="party_id">Party ID:</label>
+                        <input class="form-control" id="party_id" name="party_id" placeholder="Party ID" required formControlName="party_id"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="image">Image URL:</label>
+                        <input class="form-control" id="image" name="image" placeholder="Image URL" required formControlName="image"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="constituency_id">Constituency ID:</label>
+                        <input class="form-control" id="constituency_id" name="constituency_id" placeholder="Constituency ID" required formControlName="constituency_id"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="statement">Statement:</label>
+                        <input class="form-control" id="statement" name="statement" placeholder="Statement" required formControlName="statement"/>
+                      </div>
+                      <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">Save</button>
+                      <button type="button" class="btn btn-secondary" (click)="candidate.showForm = false">Cancel</button>
+                    </form>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -17,7 +47,7 @@
               <div class="row g-0" style="justify-content: right">
                 <div class="col-md-8">
                   <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px">Edit</button>
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="candidate.showForm = !candidate.showForm; createForm(candidate)" >Edit</button>
                     <button type="button" class="btn btn-danger">Delete</button>
                   </div>
                 </div>
