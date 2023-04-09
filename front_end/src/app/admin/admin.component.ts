@@ -1,4 +1,4 @@
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {WebService} from "../web.service";
 import {FormGroup, FormControl, Validators, FormBuilder} from '@angular/forms';
 import { ActivatedRoute } from "@angular/router";
@@ -11,23 +11,29 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./admin.component.css']
 })
 
-export class AdminComponent {
+export class AdminComponent implements OnInit {
 
   candidateFormGroup: any;
   partyFormGroup: any;
-  userFormGroup: any;
   candidate_list: any = [];
-  voter_list: any = [];
   party_list: any = [];
-
+  currentlyOpenFormId: number | null = null;
+  isAdmin: boolean = false;
 
 
 
   constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder, private voteService: VoteService, private authService: AuthService) {
 
   }
-
   ngOnInit() {
+        this.authService.userData$.subscribe((userData) => {
+      if (userData) {
+        this.isAdmin = userData.isAdmin;
+      } else {
+        this.isAdmin = false;
+      }
+    });
+
 
     this.candidateFormGroup = new FormGroup({
       candidate_firstname: new FormControl('', Validators.required),
@@ -45,7 +51,6 @@ export class AdminComponent {
     });
 
     this.candidate_list = this.webService.getCandidates();
-    this.voter_list = this.webService.getUsers();
     this.party_list = this.webService.getParties();
   }
 
@@ -74,7 +79,7 @@ export class AdminComponent {
   createPartyForm(party: any) {
     this.partyFormGroup = new FormGroup({
       party_name: new FormControl(party.party_name, Validators.required),
-      party_image: new FormControl(party.image, Validators.required),
+      image: new FormControl(party.image, Validators.required),
       manifesto: new FormControl(party.manifesto, Validators.required)
     });
   }
@@ -89,4 +94,13 @@ export class AdminComponent {
       }
   );
   }
+
+  onEditButtonClick(id: number) {
+    if (this.currentlyOpenFormId === id) {
+      this.currentlyOpenFormId = null;
+    } else {
+      this.currentlyOpenFormId = id;
+    }
+  }
+
 }

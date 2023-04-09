@@ -5,10 +5,12 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  private user: any;
 
   private _isLoggedIn = new BehaviorSubject<boolean>(this.isLoggedIn());
   public isLoggedIn$ = this._isLoggedIn.asObservable();
+
+  private _userData = new BehaviorSubject<any>(null);
+  public userData$ = this._userData.asObservable();
 
   constructor() {}
 
@@ -18,14 +20,12 @@ export class AuthService {
     return !!token;
   }
 
-  // Call this method when the user logs in
   setUser(userData: any) {
-    this.user = userData;
+    this._userData.next(userData);
   }
 
-  // Call this method to get the logged-in user's data
   getUser() {
-    return this.user;
+    return this._userData.getValue();
   }
 
   public setLoggedIn(loggedIn: boolean) {

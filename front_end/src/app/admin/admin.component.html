@@ -1,7 +1,7 @@
- <div class="container">
+ <div class="container" *ngIf="isAdmin">
     <h1 style="padding: 10px">Candidates</h1>
-    <div class="row">
-      <div class="col-md-6" *ngFor="let candidate of candidate_list | async">
+    <div class="row" >
+      <div class="col-md-6" *ngFor="let candidate of candidate_list | async" >
         <div class="card mb-3">
            <div class="row align-items-start">
             <div class="col">
@@ -9,7 +9,7 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <h5 class="card-title">{{ candidate.candidate_firstname }} {{candidate.candidate_lastname}}</h5>
-                    <div *ngIf="candidate.showForm">
+                    <div *ngIf="currentlyOpenFormId === candidate.candidate_id">
                     <form [formGroup]="candidateFormGroup" (ngSubmit)="onCandidateSubmit(candidateFormGroup.value, candidate)">
                       <div class="form-group">
                         <label for="candidate_firstname">First Name:</label>
@@ -57,8 +57,9 @@
         </div>
       </div>
     </div>
+
   </div>
- <div class="container">
+ <div class="container" *ngIf="isAdmin">
     <h1 style="padding: 10px">Parties</h1>
     <div class="row">
       <div class="col-md-6" *ngFor="let party of party_list | async">
@@ -69,15 +70,15 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <h5 class="card-title">{{ party.party_name }}</h5>
-                    <div *ngIf="party.showForm">
+                    <div *ngIf="currentlyOpenFormId === party.party_id">
                     <form [formGroup]="partyFormGroup" (ngSubmit)="onPartySubmit(partyFormGroup.value, party)">
                       <div class="form-group">
                         <label for="party_name">Image URL:</label>
                         <input class="form-control" id="party_name" name="party_name" placeholder="Party Name" required formControlName="party_name"/>
                       </div>
                       <div class="form-group">
-                        <label for="party_image">Image URL:</label>
-                        <input class="form-control" id="party_image" name="party_image" placeholder="Image URL" required formControlName="party_image"/>
+                        <label for="image">Image URL:</label>
+                        <input class="form-control" id="party_image" name="image" placeholder="Image URL" required formControlName="image"/>
                       </div>
                       <div class="form-group">
                         <label for="manifesto">Manifesto:</label>
@@ -95,7 +96,7 @@
               <div class="row g-0" style="justify-content: right">
                 <div class="col-md-8">
                   <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="party.showForm = !party.showForm; createPartyForm(party)">Edit</button>
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="onEditButtonClick(party.party_id); createPartyForm(party)">Edit</button>
                     <button type="button" class="btn btn-danger" >Delete</button>
                   </div>
                 </div>
@@ -103,6 +104,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>

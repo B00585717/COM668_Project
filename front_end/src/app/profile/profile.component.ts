@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WebService } from '../web.service';
 import { HttpClient } from '@angular/common/http';
+import {AuthService} from "../auth.service";
 
 @Component({
   selector: 'profile',
@@ -8,10 +9,19 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ProfileComponent implements OnInit {
   profile: any;
+  isAdmin: boolean = false;
 
-  constructor(private webService: WebService) {}
+  constructor(private webService: WebService, private authService: AuthService) {}
 
   ngOnInit() {
+    this.authService.userData$.subscribe((userData) => {
+      if (userData) {
+        this.isAdmin = userData.isAdmin;
+      } else {
+        this.isAdmin = false;
+      }
+    });
+
     this.webService.getProfile().subscribe(
       (profile) => {
         this.profile = profile;
