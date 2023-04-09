@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { WebService } from '../web.service';
+import { WebService } from '../services/web.service';
 import { HttpClient } from '@angular/common/http';
-import {AuthService} from "../auth.service";
+import {AuthService} from "../services/auth.service";
 
 @Component({
   selector: 'profile',

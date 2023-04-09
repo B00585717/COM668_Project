@@ -1,9 +1,9 @@
 import {Component} from "@angular/core";
-import {WebService} from "../web.service";
+import {WebService} from "../services/web.service";
 import {FormBuilder} from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
-import {VoteService} from "../vote.service";
-import { AuthService } from '../auth.service';
+import {VoteService} from "../services/vote.service";
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'candidates',

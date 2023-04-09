@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { WebService } from '../web.service';
-import { AuthService } from '../auth.service';
+import { WebService } from '../services/web.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'password_change',

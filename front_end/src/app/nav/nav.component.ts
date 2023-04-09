@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import {AuthService} from "../auth.service";
-import {WebService} from "../web.service";
+import {AuthService} from "../services/auth.service";
+import {WebService} from "../services/web.service";
 @Component({
  selector: 'navigation',
  templateUrl: './nav.component.html',

@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import {HomeComponent} from './home/home.component';
 import {RouterModule} from "@angular/router";
 import {HttpClientModule} from "@angular/common/http";
-import {WebService} from "./web.service";
+import {WebService} from "./services/web.service";
 import {RegisterComponent} from './register/register.component';
 import {LoginComponent} from './login/login.component';
 import {CandidatesComponent} from './candidates/candidates.component';
@@ -19,7 +19,7 @@ import {NgxCaptchaModule} from "ngx-captcha";
 import {FormsModule} from '@angular/forms';
 import {LogoutComponent} from "./logout/logout.component";
 import {VerificationComponent} from "./register/verification.component"
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import {NavComponent} from "./nav/nav.component";
 import {Password_changeComponent} from "./profile/password_change.component";
 import {AdminComponent} from "./admin/admin.component";

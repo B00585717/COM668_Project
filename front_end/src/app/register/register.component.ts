@@ -1,9 +1,9 @@
 import {Component} from "@angular/core";
 import {FormBuilder, Validators} from "@angular/forms";
-import {WebService} from "../web.service";
+import {WebService} from "../services/web.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import { HttpClient } from '@angular/common/http';
-import { EmailService } from '../email.service';
+import { EmailService } from '../services/email.service';
 
 
 @Component({

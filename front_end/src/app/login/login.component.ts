@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import {WebService} from "../web.service";
+import {WebService} from "../services/web.service";
 import {Router} from '@angular/router';
-import {AuthService} from '../auth.service';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'login',

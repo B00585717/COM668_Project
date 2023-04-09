@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
 import {FormBuilder} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
-import {WebService} from "../web.service";
+import {WebService} from "../services/web.service";
 
 @Component({
   selector: 'candidate',

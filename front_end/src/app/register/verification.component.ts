@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {FormBuilder, Validators} from "@angular/forms";
-import { EmailService } from '../email.service';
+import { EmailService } from '../services/email.service';
 
 @Component({
   selector: 'verification',
