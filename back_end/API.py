@@ -162,7 +162,8 @@ def login():
                 'last_name': user.last_name,
                 'gov_id': user.gov_id,
                 'email': user.email,
-                'constituency_id': user.constituency_id
+                'constituency_id': user.constituency_id,
+                'isAdmin': user.isAdmin
             }
 
             # Return access token
@@ -279,17 +280,15 @@ def edit_party(id):
         im = request.form["image"]
         ma = request.form["manifesto"]
 
-        party = session.query(Party).filter_by(party_name=pn).first()
-        if party:
-            return make_response("Party already exists!", 403)
+        party = session.query(Party).filter_by(party_id=id).first()
+
+        if not party:
+            return make_response("Party not found", 404)
 
         elif not pn or not im or not ma:
             return make_response("Please complete form", 404)
 
         else:
-            party = session.query(Party).filter_by(party_id=id).first()
-            if not party:
-                return make_response("Party not found", 404)
 
             party.party_name = pn
             party.image = im
