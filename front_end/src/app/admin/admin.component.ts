@@ -13,7 +13,9 @@ import { AuthService } from '../auth.service';
 
 export class AdminComponent {
 
-  formGroup: any;
+  candidateFormGroup: any;
+  partyFormGroup: any;
+  userFormGroup: any;
   candidate_list: any = [];
   voter_list: any = [];
   party_list: any = [];
@@ -27,7 +29,7 @@ export class AdminComponent {
 
   ngOnInit() {
 
-    this.formGroup = new FormGroup({
+    this.candidateFormGroup = new FormGroup({
       candidate_firstname: new FormControl('', Validators.required),
       candidate_lastname: new FormControl('', Validators.required),
       party_id: new FormControl('', Validators.required),
@@ -36,25 +38,31 @@ export class AdminComponent {
       statement: new FormControl('', Validators.required)
     });
 
+    this.partyFormGroup = new FormGroup({
+      party_name: new FormControl('', Validators.required),
+      image: new FormControl('', Validators.required),
+      manifesto: new FormControl('', Validators.required)
+    });
+
     this.candidate_list = this.webService.getCandidates();
     this.voter_list = this.webService.getUsers();
     this.party_list = this.webService.getParties();
   }
 
 
-  onSubmit(candidateData: any, candidate: any) {
+  onCandidateSubmit(candidateData: any, candidate: any) {
   this.webService.updateCandidate({...candidateData, candidate_id: candidate.candidate_id}).subscribe(
     response => {
       console.log('Candidate updated successfully', response);
-      // You can refresh the candidate list here or show a success message
     },
     error => {
       console.error('Error updating candidate', error);
     }
   );
   }
-  createForm(candidate: any) {
-    this.formGroup = new FormGroup({
+
+  createCandidateForm(candidate: any) {
+    this.candidateFormGroup = new FormGroup({
       candidate_firstname: new FormControl(candidate.candidate_firstname, Validators.required),
       candidate_lastname: new FormControl(candidate.candidate_lastname, Validators.required),
       party_id: new FormControl(candidate.party_id, Validators.required),
@@ -62,5 +70,23 @@ export class AdminComponent {
       constituency_id: new FormControl(candidate.constituency_id, Validators.required),
       statement: new FormControl(candidate.statement, Validators.required)
     });
+  }
+  createPartyForm(party: any) {
+    this.partyFormGroup = new FormGroup({
+      party_name: new FormControl(party.party_name, Validators.required),
+      party_image: new FormControl(party.image, Validators.required),
+      manifesto: new FormControl(party.manifesto, Validators.required)
+    });
+  }
+
+  onPartySubmit(partyData: any, party: any) {
+    this.webService.updateParty({...partyData, party_id: party.party_id}).subscribe(
+      response => {
+        console.log('Party updated successfully', response);
+      },
+      error => {
+        console.error('Error updating party', error);
+      }
+  );
   }
 }

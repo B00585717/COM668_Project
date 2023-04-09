@@ -63,7 +63,7 @@ constructor(private http: HttpClient) {}
 
   updateParty(party: any){
     let formData = this.partyForm(party);
-    return this.http.put('http://localhost:5000/api/v1.0/parties/'+ this.partyId, formData);
+    return this.http.put('http://localhost:5000/api/v1.0/parties/'+ party.party_id, formData);
   }
 
 

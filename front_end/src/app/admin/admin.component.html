@@ -10,7 +10,7 @@
                   <div class="card-body">
                     <h5 class="card-title">{{ candidate.candidate_firstname }} {{candidate.candidate_lastname}}</h5>
                     <div *ngIf="candidate.showForm">
-                    <form [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup.value, candidate)">
+                    <form [formGroup]="candidateFormGroup" (ngSubmit)="onCandidateSubmit(candidateFormGroup.value, candidate)">
                       <div class="form-group">
                         <label for="candidate_firstname">First Name:</label>
                         <input id="candidate_firstname" name="candidate_firstname" placeholder="First Name" required formControlName="candidate_firstname" />
@@ -35,7 +35,7 @@
                         <label for="statement">Statement:</label>
                         <input class="form-control" id="statement" name="statement" placeholder="Statement" required formControlName="statement"/>
                       </div>
-                      <button type="submit" class="btn btn-primary" [disabled]="formGroup.invalid">Save</button>
+                      <button type="submit" class="btn btn-primary" [disabled]="candidateFormGroup.invalid">Save</button>
                       <button type="button" class="btn btn-secondary" (click)="candidate.showForm = false">Cancel</button>
                     </form>
                   </div>
@@ -47,7 +47,7 @@
               <div class="row g-0" style="justify-content: right">
                 <div class="col-md-8">
                   <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="candidate.showForm = !candidate.showForm; createForm(candidate)" >Edit</button>
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="candidate.showForm = !candidate.showForm; createCandidateForm(candidate)" >Edit</button>
                     <button type="button" class="btn btn-danger">Delete</button>
                   </div>
                 </div>
@@ -69,6 +69,24 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <h5 class="card-title">{{ party.party_name }}</h5>
+                    <div *ngIf="party.showForm">
+                    <form [formGroup]="partyFormGroup" (ngSubmit)="onPartySubmit(partyFormGroup.value, party)">
+                      <div class="form-group">
+                        <label for="party_name">Image URL:</label>
+                        <input class="form-control" id="party_name" name="party_name" placeholder="Party Name" required formControlName="party_name"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="party_image">Image URL:</label>
+                        <input class="form-control" id="party_image" name="party_image" placeholder="Image URL" required formControlName="party_image"/>
+                      </div>
+                      <div class="form-group">
+                        <label for="manifesto">Manifesto:</label>
+                        <input class="form-control" id="manifesto" name="manifesto" placeholder="Manifesto" required formControlName="manifesto"/>
+                      </div>
+                      <button type="submit" class="btn btn-primary" [disabled]="partyFormGroup.invalid">Save</button>
+                      <button type="button" class="btn btn-secondary" (click)="party.showForm = false">Cancel</button>
+                    </form>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -77,7 +95,7 @@
               <div class="row g-0" style="justify-content: right">
                 <div class="col-md-8">
                   <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px">Edit</button>
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="party.showForm = !party.showForm; createPartyForm(party)">Edit</button>
                     <button type="button" class="btn btn-danger" >Delete</button>
                   </div>
                 </div>
@@ -88,35 +106,3 @@
       </div>
     </div>
   </div>
- <div class="container">
-    <h1 style="padding: 10px">Users</h1>
-    <div class="row">
-      <div class="col-md-6" *ngFor="let party of voter_list | async">
-        <div class="card mb-3">
-           <div class="row align-items-start">
-            <div class="col">
-              <div class="row g-0">
-                <div class="col-md-8">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ party.first_name }}</h5>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="row g-0" style="justify-content: right">
-                <div class="col-md-8">
-                  <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px">Edit</button>
-                    <button type="button" class="btn btn-danger" >Delete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-

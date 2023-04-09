@@ -366,6 +366,7 @@ def show_one_candidate(id):
 
 
 @app.route("/api/v1.0/candidates/<id>", methods=["PUT"])
+@admin_required
 def edit_candidate(id):
     if "candidate_firstname" in request.form \
             and "candidate_lastname" in request.form \
