@@ -20,13 +20,17 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '18.x'
-
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: onlineelectionsystem/front_end/node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('onlineelectionsystem/front_end/package-lock.json') }}
       - name: npm install, build, and test
         run: |
           cd front_end
           npm install
           npm run build --if-present
-          npm run test --if-present
+          npm test -- --maxWorkers=4
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
