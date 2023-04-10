@@ -51,10 +51,16 @@ export class AuthService {
 
   setVoterId(voter_id: number) {
     this.voter_id = voter_id;
+    localStorage.setItem('voter_id', voter_id.toString());
   }
 
   // Add a new method to get voter_id
   getVoterId(): number | null {
-    return this.voter_id;
+    const voterIdStr = localStorage.getItem('voter_id');
+    if (voterIdStr) {
+      return parseInt(voterIdStr, 10);
+    } else {
+      return null;
+    }
   }
 }

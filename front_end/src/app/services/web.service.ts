@@ -58,7 +58,14 @@ constructor(private http: HttpClient) {}
   }
 
   logout() {
+    const token = localStorage.getItem('access_token');
+    const headers = { Authorization: `Bearer ${token}` };
+    this.http.post('http://localhost:5000/api/v1.0/logout', {}, { headers }).subscribe(
+      response => console.log('Access token revoked'),
+      error => console.error('Error revoking access token', error)
+    );
     localStorage.removeItem('access_token');
+    localStorage.removeItem('voter_id')
   }
 
   updateParty(party: any){
