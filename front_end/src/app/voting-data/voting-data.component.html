@@ -1,0 +1,19 @@
+<h1>Voting Data</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Candidate Name</th>
+      <th>Party Name</th>
+      <th>Vote Count</th>
+      <th>Vote Percentage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of votingData">
+      <td>{{ item.candidate_name }}</td>
+      <td>{{ item.party_name }}</td>
+      <td>{{ item.vote_count }}</td>
+      <td>{{ item.vote_percentage | number:'1.1-1' }}%</td>
+    </tr>
+  </tbody>
+</table>

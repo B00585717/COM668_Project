@@ -104,6 +104,10 @@ constructor(private http: HttpClient) {}
     return this.http.delete('http://localhost:5000/api/v1.0/parties/' + party_id, { headers: headers });
   }
 
+  getVotingData() {
+    return this.http.get('http://localhost:5000/api/v1.0/voting-data');
+  }
+
   private voterForm(voter: any) {
 
     let formData = new FormData();

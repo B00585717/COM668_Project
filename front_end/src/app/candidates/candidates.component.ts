@@ -15,7 +15,6 @@ export class CandidatesComponent {
 
   candidate_list: any = [];
   candidate_form: any;
-
   voter_id: any;
 
   constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder, private voteService: VoteService, private authService: AuthService) {
@@ -36,8 +35,7 @@ export class CandidatesComponent {
 
     this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
       if (isLoggedIn) {
-        const user = this.authService.getUser();
-        this.voter_id = user ? user.voter_id : null;
+        this.voter_id = this.authService.getVoterId()
       } else {
         this.voter_id = null;
       }

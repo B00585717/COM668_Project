@@ -13,6 +13,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from DBConfig import DBConfig
 from flask_cors import CORS
 from Models import Voter, Verification, Party, Candidate, engine, Constituency, Votes
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.secret_key = config('SK')
@@ -600,6 +601,35 @@ def make_user_admin(gov_id):
     user.isAdmin = True
     session.commit()
     return make_response(jsonify({"message": "User is now an admin"}), 200)
+
+
+def fetch_voting_data():
+    # Fetch candidate data along with their associated party data
+    candidates = session.query(Candidate, Party)\
+        .join(Party, Candidate.party_id == Party.party_id)\
+        .all()
+
+    # Calculate the total number of votes
+    total_votes = session.query(func.sum(Candidate.vote_count)).scalar()
+
+    # Prepare the voting data
+    voting_data = []
+    for candidate, party in candidates:
+        voting_data.append({
+            "candidate_id": candidate.candidate_id,
+            "candidate_name": f"{candidate.candidate_firstname} {candidate.candidate_lastname}",
+            "party_name": party.party_name,
+            "vote_count": candidate.vote_count,
+            "vote_percentage": (candidate.vote_count / total_votes) * 100 if total_votes else 0
+        })
+
+    return voting_data
+
+
+@app.route("/api/v1.0/voting-data", methods=["GET"])
+def get_voting_data():
+    voting_data = fetch_voting_data()
+    return jsonify(voting_data)
 
 
 ########## HELPER FUNCTIONS ##########

@@ -23,7 +23,8 @@ export class LoginComponent {
         this.authService.setUser(loggedInUserData);
         this.router.navigate(['/profile']);
         this.authService.getIsAdmin()
-        console.log(this.authService.getIsAdmin())
+
+        this.authService.setVoterId(loggedInUserData.voter_id);
 
         sessionStorage.setItem('access_token', response.access_token);
       },

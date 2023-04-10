@@ -16,6 +16,7 @@ export class AuthService {
   public isAdmin$ = this._isAdmin.asObservable();
 
   private user: any;
+  private voter_id: any;
 
   constructor() {}
 
@@ -46,5 +47,14 @@ export class AuthService {
   public setIsAdmin(isAdmin: boolean) {
     localStorage.setItem('isAdmin', isAdmin.toString());
     this._isAdmin.next(isAdmin);
+  }
+
+  setVoterId(voter_id: number) {
+    this.voter_id = voter_id;
+  }
+
+  // Add a new method to get voter_id
+  getVoterId(): number | null {
+    return this.voter_id;
   }
 }
