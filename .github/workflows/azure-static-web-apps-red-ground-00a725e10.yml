@@ -20,6 +20,7 @@ jobs:
           submodules: true
       - name: Set ownership of npm cache folder
         run: |
+          mkdir -p /github/home/.npm
           chown -R $(id -u):$(id -g) /github/home/.npm
       - name: Build And Deploy
         id: builddeploy
