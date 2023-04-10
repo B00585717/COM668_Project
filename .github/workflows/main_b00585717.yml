@@ -29,8 +29,8 @@ jobs:
         run: |
           cd front_end
           npm install
-          npm run build --if-present
-          npm test -- --maxWorkers=4
+          npm run build --if-present --parallel
+          npm test
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
