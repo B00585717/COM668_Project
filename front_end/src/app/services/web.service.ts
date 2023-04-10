@@ -36,13 +36,19 @@ constructor(private http: HttpClient) {}
   }
 
   addParty(party: any){
+      const headers = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+  });
     let formData = this.partyForm(party);
-    return this.http.post('http://localhost:5000/api/v1.0/parties', formData);
+    return this.http.post('http://localhost:5000/api/v1.0/parties', formData, { headers });
   }
 
   addCandidate(candidate: any){
-  let formData = this.candidateForm(candidate);
-    return this.http.post('http://localhost:5000/api/v1.0/candidates', formData);
+   const headers = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+  });
+    let formData = this.candidateForm(candidate);
+    return this.http.post('http://localhost:5000/api/v1.0/candidates', formData, { headers });
   }
 
   addVoter(voter: any){

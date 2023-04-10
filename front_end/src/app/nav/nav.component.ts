@@ -5,7 +5,7 @@ import {WebService} from "../services/web.service";
 @Component({
  selector: 'navigation',
  templateUrl: './nav.component.html',
- styleUrls: []
+ styleUrls: ['./nav.component.css']
 })
 export class NavComponent {
   isLoggedIn: boolean=true;
@@ -28,6 +28,6 @@ export class NavComponent {
   logout() {
     this.webService.logout()
     this.isLoggedIn = false;
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 }

@@ -1,6 +1,39 @@
 <div class="container" *ngIf="isAdmin">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
-  <h1 style="padding: 10px">Candidates</h1>
+  <h1 style="padding: 10px">Candidates <button type="button" class="btn btn-outline-success" style="margin-right: 10px"><i class="fa fa-plus" (click)="toggleAddCandidateForm()"></i></button></h1>
+  <form [formGroup]="candidateFormGroup" (submit)="addCandidate(candidateFormGroup.value)" *ngIf="showAddCandidateForm">
+    <div class="form-group">
+      <label for="candidate_firstname">First Name:</label>
+      <input class="form-control" id="add_candidate_firstname" name="candidate_firstname"
+             placeholder="First Name" required formControlName="candidate_firstname"/>
+    </div>
+    <div class="form-group">
+      <label for="candidate_lastname">Last Name:</label>
+      <input class="form-control" id="add_candidate_lastname" name="candidate_lastname"
+             placeholder="Last Name" required formControlName="candidate_lastname"/>
+    </div>
+    <div class="form-group">
+      <label for="party_id">Party ID:</label>
+      <input class="form-control" id="add_party_id" name="party_id" placeholder="Party ID" required
+             formControlName="party_id"/>
+    </div>
+    <div class="form-group">
+      <label for="image">Image URL:</label>
+      <input class="form-control" id="add_image" name="image" placeholder="Image URL" required
+             formControlName="image"/>
+    </div>
+    <div class="form-group">
+      <label for="constituency_id">Constituency ID:</label>
+      <input class="form-control" id="add_constituency_id" name="constituency_id"
+             placeholder="Constituency ID" required formControlName="constituency_id"/>
+    </div>
+    <div class="form-group">
+      <label for="statement">Statement:</label>
+      <input class="form-control" id="add_statement" name="statement" placeholder="Statement" required
+             formControlName="statement"/>
+    </div>
+    <button type="submit" class="btn btn-success">Add Party</button>
+  </form>
   <div class="row">
     <div class="col-md-5" *ngFor="let candidate of candidate_list | async">
       <div class="card mb-3">
@@ -81,8 +114,25 @@
 </div>
 
 <div class="container" *ngIf="isAdmin">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
-  <h1 style="padding: 10px">Parties</h1>
+  <h1 style="padding: 10px"> Parties <button type="button" class="btn btn-outline-success" style="margin-right: 10px"><i class="fa fa-plus" (click)="toggleAddPartyForm()"></i></button></h1>
+  <form [formGroup]="partyFormGroup" (submit)="addParty(partyFormGroup.value)" *ngIf="showAddPartyForm">
+    <div class="form-group">
+      <label for="party_name">Image URL:</label>
+      <input class="form-control" id="add_party_name" name="party_name" placeholder="Party Name" required
+             formControlName="party_name"/>
+    </div>
+    <div class="form-group">
+      <label for="image">Image URL:</label>
+      <input class="form-control" id="add_party_image" name="image" placeholder="Image URL" required
+             formControlName="image"/>
+    </div>
+    <div class="form-group">
+      <label for="manifesto">Manifesto:</label>
+      <input class="form-control" id="add_manifesto" name="manifesto" placeholder="Manifesto" required
+             formControlName="manifesto"/>
+    </div>
+    <button type="submit" class="btn btn-success">Add Party</button>
+  </form>
   <div class="row">
     <div class="col-md-5" *ngFor="let party of party_list | async">
       <div class="card mb-3">

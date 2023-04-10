@@ -1,37 +1,33 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" routerLink='/'>Online Election System</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav">
-      <li class="nav-item active">
-        <a class="nav-link" routerLink='/'>Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink='/parties'>Parties</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink='/candidates'>Candidates</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink='/profile'>Profile</a>
-      </li>
-      <li *ngIf="!isLoggedIn" class="nav-item" style="margin-left: 800px">
-        <div class="form-inline ">
-          <button class="btn btn-secondary" routerLink='/verification'>Register</button>
-        </div>
-      </li>
-      <li *ngIf="!isLoggedIn" class="nav-item" style="margin-left: 10px">
-        <div class="form-inline ">
-          <button class="btn btn-secondary" routerLink='/login'>Login</button>
-        </div>
-      </li>
-      <li *ngIf="isLoggedIn" class="nav-item" style="margin-left: 800px">
-        <div class="form-inline ">
-          <button class="btn btn-secondary" (click)="logout()">Logout</button>
-        </div>
-      </li>
-    </ul>
-  </div>
-</nav>
+<div class="nav-container">
+<header>
+  <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+    <a class="navbar-brand" style="margin-left: 50px" routerLink='/'>Online Election System</a>
+    <div class="position-sticky">
+      <div class="list-group list-group-flush mx-3 mt-4">
+        <a href="/" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+          <i class="fas fa-home fa-fw me-3"></i><span>Home</span>
+        </a>
+        <a href="/candidates" class="list-group-item list-group-item-action py-2 ripple">
+          <i class="fas fa-users fa-fw me-3"></i><span>Candidates</span>
+        </a>
+        <a href="/parties" class="list-group-item list-group-item-action py-2 ripple"><i
+            class="fas fa-address-book fa-fw me-3"></i><span>Parties</span></a>
+        <a href="/profile" class="list-group-item list-group-item-action py-2 ripple"><i
+            class="fas fa-user fa-fw me-3"></i><span>Profile</span></a>
+        <a href="#" class="list-group-item list-group-item-action py-2 ripple">
+          <i class="fas fa-question fa-fw me-3"></i><span>FAQ</span>
+        </a>
+        <a href="/voting-data" class="list-group-item list-group-item-action py-2 ripple"><i
+            class="fas fa-chart-bar fa-fw me-3"></i><span>Current Voting</span></a>
+      </div>
+    </div>
+    <div class="d-flex flex-row justify-content-around align-items-center p-3" style="margin-top: 400px; margin-left: 30px">
+      <a href="https://github.com/B00585717/COM668_Project" class="list-group-item list-group-item-action py-2 ripple"><i class="fab fa-github" aria-hidden="false"></i></a>
+      <a href="" class="list-group-item list-group-item-action py-2 ripple"><i class="fa fa-envelope"></i></a>
+      <button *ngIf="!isLoggedIn" class="list-group-item list-group-item-action py-2 ripple" (click)="logout()"><i class="fas fa-sign-in-alt"></i></button>
+      <button *ngIf="isLoggedIn" (click)="logout()" routerLink='/login' class="list-group-item list-group-item-action py-2 ripple"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </nav>
+</header>
+</div>

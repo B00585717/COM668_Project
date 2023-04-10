@@ -19,6 +19,8 @@ export class AdminComponent implements OnInit {
   party_list: any = [];
   currentlyOpenFormId: number | null = null;
   isAdmin: boolean = false;
+  showAddPartyForm = false;
+  showAddCandidateForm = false;
 
 
 
@@ -111,6 +113,38 @@ export class AdminComponent implements OnInit {
     } else {
       this.currentlyOpenFormId = id;
     }
+  }
+
+  toggleAddPartyForm() {
+    this.showAddPartyForm = !this.showAddPartyForm;
+  }
+
+  toggleAddCandidateForm() {
+    this.showAddCandidateForm = !this.showAddCandidateForm;
+  }
+
+  addParty(partyData: any) {
+  this.webService.addParty(partyData).subscribe(
+    response => {
+      console.log('Party added successfully', response);
+      this.partyFormGroup.reset();
+    },
+    error => {
+      console.error('Error adding party', error);
+    }
+  );
+  }
+
+  addCandidate(candidateData: any) {
+    this.webService.addCandidate(candidateData).subscribe(
+      response => {
+        console.log('Candidate added successfully', response);
+        this.candidateFormGroup.reset();
+      },
+      error => {
+        console.error('Error adding candidate', error);
+      }
+  );
   }
 
 }

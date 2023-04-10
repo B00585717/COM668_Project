@@ -1,47 +1,40 @@
-<html lang="en" class="h-100">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="register.component.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
+<section class="vh-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-md-8 col-lg-6 col-xl-4">
+        <form [formGroup]="registrationForm" (submit)="onSubmit()">
+          <div class="divider d-flex align-items-center my-4">
+            <p class="text-center fw-bold mx-3 mb-0">Register</p>
+          </div>
 
-<body>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="first_name">First Name:</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" formControlName="first_name" placeholder="Enter First Name">
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="last_name">Last Name:</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" formControlName="last_name" placeholder="Enter Last Name">
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="postcode">Postcode:</label>
+            <input type="text" class="form-control" id="postcode" name="last_name" formControlName="postcode" placeholder="Enter Postcode">
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="email">Email:</label>
+            <input type="email" class="form-control" id = email formControlName="email" placeholder="Email" readonly>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="password">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" formControlName="password" placeholder="Enter password">
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="otp">OTP:</label>
+            <input type="otp" class="form-control" id="otp" name="password" formControlName="otp" placeholder="Enter OTP">
+          </div>
 
-<div class="container">
-  <h2>Registration</h2>
-  <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="first_name">First Name:</label>
-      <input type="text" class="form-control" id="first_name" name="first_name" formControlName="first_name" placeholder="Enter First Name">
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="last_name">Last Name :</label>
-      <input type="text" class="form-control" id="last_name" name="last_name" formControlName="last_name" placeholder="Enter Last Name">
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="postcode">Postcode :</label>
-      <input type="text" class="form-control" id="postcode" name="last_name" formControlName="postcode" placeholder="Enter Postcode">
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="email">Email:</label>
-      <input type="email" class="form-control" formControlName="email" placeholder="Email" readonly>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="password">Password:</label>
-      <input type="password" class="form-control" id="password" name="password" formControlName="password" placeholder="Enter password">
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2" for="otp">OTP:</label>
-      <input type="otp" class="form-control" id="otp" name="password" formControlName="otp" placeholder="Enter OTP">
-    </div>
+          <ngx-recaptcha2 [siteKey]="siteKey" formControlName="recaptcha"></ngx-recaptcha2>
 
-    <ngx-recaptcha2 [siteKey]="siteKey" formControlName="recaptcha"></ngx-recaptcha2>
-
-    <button type="submit" class="btn btn-primary btn-customized" [disabled]="!registrationForm.valid">Register</button>
-  </form>
-</div>
-
-</body>
-</html>
+          <button type="submit" class="btn btn-primary btn-customized" [disabled]="!registrationForm.valid">Register</button>
+        </form>
+      </div>
+    </div>
+</section>
