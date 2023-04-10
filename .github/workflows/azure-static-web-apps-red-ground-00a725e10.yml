@@ -18,6 +18,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Configure npm cache
+        run: |
+          echo "NPM_CONFIG_CACHE=$(pwd)/.npm" >> $GITHUB_ENV
       - name: Set ownership of npm cache folder
         run: |
           mkdir -p /github/home/.npm
