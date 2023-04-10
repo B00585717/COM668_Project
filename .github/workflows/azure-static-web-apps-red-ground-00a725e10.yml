@@ -23,8 +23,8 @@ jobs:
           echo "NPM_CONFIG_CACHE=$(pwd)/.npm" >> $GITHUB_ENV
       - name: Set ownership of npm cache folder
         run: |
-          mkdir -p /github/home/.npm
-          chown -R $(id -u):$(id -g) /github/home/.npm
+          mkdir -p /home/runner/.npm
+          chown -R $(id -u):$(id -g) /home/runner/.npm
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
