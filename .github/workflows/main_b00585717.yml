@@ -24,7 +24,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: onlineelectionsystem/front_end/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('onlineelectionsystem/front_end/package-lock.json') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('front_end/package-lock.json') }}
       - name: npm install, build, and test
         run: |
           cd front_end
