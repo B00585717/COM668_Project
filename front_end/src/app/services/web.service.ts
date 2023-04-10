@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import { tap } from 'rxjs/operators';
 
 @Injectable()
@@ -62,14 +62,20 @@ constructor(private http: HttpClient) {}
   }
 
   updateParty(party: any){
+      const headers = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+  });
     let formData = this.partyForm(party);
-    return this.http.put('http://localhost:5000/api/v1.0/parties/'+ party.party_id, formData);
+    return this.http.put('http://localhost:5000/api/v1.0/parties/'+ party.party_id, formData, { headers: headers });
   }
 
 
   updateCandidate(candidate: any) {
+    const headers = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+  });
     let formData = this.candidateForm(candidate);
-    return this.http.put('http://localhost:5000/api/v1.0/candidates/' + candidate.candidate_id, formData);
+    return this.http.put('http://localhost:5000/api/v1.0/candidates/' + candidate.candidate_id, formData, { headers: headers });
   }
 
   updatePassword(g_id: string,email: string, newPassword: string) {
@@ -82,6 +88,20 @@ constructor(private http: HttpClient) {}
 
   getUsers() {
     return this.http.get('http://localhost:5000/api/v1.0/voters');
+  }
+
+  deleteCandidate(candidate_id: any){
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+    });
+    return this.http.delete('http://localhost:5000/api/v1.0/candidates/' + candidate_id,{ headers: headers });
+  }
+
+  deleteParty(party_id: any){
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+    });
+    return this.http.delete('http://localhost:5000/api/v1.0/parties/' + party_id, { headers: headers });
   }
 
   private voterForm(voter: any) {

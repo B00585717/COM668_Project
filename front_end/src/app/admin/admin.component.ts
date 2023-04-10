@@ -26,12 +26,8 @@ export class AdminComponent implements OnInit {
 
   }
   ngOnInit() {
-        this.authService.userData$.subscribe((userData) => {
-      if (userData) {
-        this.isAdmin = userData.isAdmin;
-      } else {
-        this.isAdmin = false;
-      }
+      this.authService.isAdmin$.subscribe((isAdmin) => {
+      this.isAdmin = isAdmin;
     });
 
 
@@ -65,6 +61,20 @@ export class AdminComponent implements OnInit {
     }
   );
   }
+
+  onCandidateDelete(candidate: any){
+    this.webService.deleteCandidate(candidate.candidate_id).subscribe(
+      response => {
+        console.log("Candidate Deleted")
+      }
+    )}
+
+  onPartyDelete(party: any){
+  this.webService.deleteParty(party.party_id).subscribe(
+    response => {
+      console.log("Party Deleted")
+    }
+  )}
 
   createCandidateForm(candidate: any) {
     this.candidateFormGroup = new FormGroup({

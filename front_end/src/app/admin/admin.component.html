@@ -47,8 +47,8 @@
               <div class="row g-0" style="justify-content: right">
                 <div class="col-md-8">
                   <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="candidate.showForm = !candidate.showForm; createCandidateForm(candidate)" >Edit</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="onEditButtonClick(candidate.candidate_id); createCandidateForm(candidate)" >Edit</button>
+                    <button type="button" class="btn btn-danger" (click)="onCandidateDelete(candidate)">Delete</button>
                   </div>
                 </div>
               </div>
@@ -97,7 +97,7 @@
                 <div class="col-md-8">
                   <div class="card-body">
                     <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="onEditButtonClick(party.party_id); createPartyForm(party)">Edit</button>
-                    <button type="button" class="btn btn-danger" >Delete</button>
+                    <button type="button" class="btn btn-danger" (click)="onPartyDelete(party)">Delete</button>
                   </div>
                 </div>
               </div>

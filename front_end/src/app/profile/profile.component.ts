@@ -14,12 +14,8 @@ export class ProfileComponent implements OnInit {
   constructor(private webService: WebService, private authService: AuthService) {}
 
   ngOnInit() {
-    this.authService.userData$.subscribe((userData) => {
-      if (userData) {
-        this.isAdmin = userData.isAdmin;
-      } else {
-        this.isAdmin = false;
-      }
+    this.authService.isAdmin$.subscribe((isAdmin) => {
+      this.isAdmin = isAdmin;
     });
 
     this.webService.getProfile().subscribe(

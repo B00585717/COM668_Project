@@ -22,6 +22,8 @@ export class LoginComponent {
         this.authService.setLoggedIn(true);
         this.authService.setUser(loggedInUserData);
         this.router.navigate(['/profile']);
+        this.authService.getIsAdmin()
+        console.log(this.authService.getIsAdmin())
 
         sessionStorage.setItem('access_token', response.access_token);
       },
