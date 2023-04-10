@@ -20,7 +20,7 @@ import {FormsModule} from '@angular/forms';
 import {LogoutComponent} from "./logout/logout.component";
 import {VerificationComponent} from "./register/verification.component"
 import { AuthService } from './services/auth.service';
-import {NavComponent} from "./nav/nav.component";
+import {NavigationComponent} from "./nav/navigation.component";
 import {Password_changeComponent} from "./profile/password_change.component";
 import {AdminComponent} from "./admin/admin.component";
 import {VotingDataComponent} from "./voting-data/voting-data.component";
@@ -96,7 +96,7 @@ var routes: any = [
     ProfileComponent,
     LogoutComponent,
     VerificationComponent,
-    NavComponent,
+    NavigationComponent,
     Password_changeComponent,
     AdminComponent,
     VotingDataComponent
