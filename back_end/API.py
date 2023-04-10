@@ -620,6 +620,7 @@ def fetch_voting_data():
             "candidate_name": f"{candidate.candidate_firstname} {candidate.candidate_lastname}",
             "party_name": party.party_name,
             "vote_count": candidate.vote_count,
+            "candidate_image": candidate.image,
             "vote_percentage": (candidate.vote_count / total_votes) * 100 if total_votes else 0
         })
 

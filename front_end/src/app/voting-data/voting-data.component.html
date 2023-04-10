@@ -1,7 +1,8 @@
 <h1>Voting Data</h1>
-<table>
+<table style="margin: auto; max-width: 1000px">
   <thead>
     <tr>
+      <th>Candidate Image</th>
       <th>Candidate Name</th>
       <th>Party Name</th>
       <th>Vote Count</th>
@@ -10,6 +11,7 @@
   </thead>
   <tbody>
     <tr *ngFor="let item of votingData">
+      <td><img src="{{item.candidate_image}}" style="width: 50px; height: 50px; border-radius: 50%" alt=""></td>
       <td>{{ item.candidate_name }}</td>
       <td>{{ item.party_name }}</td>
       <td>{{ item.vote_count }}</td>
@@ -17,3 +19,18 @@
     </tr>
   </tbody>
 </table>
+<div class="container" >
+  <div class="row" >
+    <div class="col-md-6">
+      <div class="chart-container" style="padding: 50px">
+        <canvas id="votingBarChart">{{ votingBarChart }}</canvas>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="chart-container" style="padding: 50px">
+        <canvas id="votingPieChart">{{ votingPieChart }}</canvas>
+      </div>
+    </div>
+  </div>
+</div>

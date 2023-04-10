@@ -1,55 +1,75 @@
- <div class="container" *ngIf="isAdmin">
-    <h1 style="padding: 10px">Candidates</h1>
-    <div class="row" >
-      <div class="col-md-6" *ngFor="let candidate of candidate_list | async" >
-        <div class="card mb-3">
-           <div class="row align-items-start">
-            <div class="col">
-              <div class="row g-0">
-                <div class="col-md-8">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ candidate.candidate_firstname }} {{candidate.candidate_lastname}}</h5>
-                    <div *ngIf="currentlyOpenFormId === candidate.candidate_id">
+<div class="container" *ngIf="isAdmin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <h1 style="padding: 10px">Candidates</h1>
+  <div class="row">
+    <div class="col-md-5" *ngFor="let candidate of candidate_list | async">
+      <div class="card mb-3">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-12">
+                  <img src="{{candidate.image}}" style="width: 50px; height: 50px; border-radius: 50%" alt="">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-12">
+                  <h5 class="card-title">{{ candidate.candidate_firstname }} {{candidate.candidate_lastname}}</h5>
+                </div>
+                <div *ngIf="currentlyOpenFormId === candidate.candidate_id">
                     <form [formGroup]="candidateFormGroup" (ngSubmit)="onCandidateSubmit(candidateFormGroup.value, candidate)">
                       <div class="form-group">
                         <label for="candidate_firstname">First Name:</label>
-                        <input id="candidate_firstname" name="candidate_firstname" placeholder="First Name" required formControlName="candidate_firstname" />
+                        <input id="candidate_firstname" name="candidate_firstname" placeholder="First Name" required
+                               formControlName="candidate_firstname"/>
                       </div>
                       <div class="form-group">
                         <label for="candidate_lastname">Last Name:</label>
-                        <input class="form-control"  id="candidate_lastname" name="candidate_lastname" placeholder="Last Name" required formControlName="candidate_lastname"/>
+                        <input class="form-control" id="candidate_lastname" name="candidate_lastname"
+                               placeholder="Last Name" required formControlName="candidate_lastname"/>
                       </div>
                       <div class="form-group">
                         <label for="party_id">Party ID:</label>
-                        <input class="form-control" id="party_id" name="party_id" placeholder="Party ID" required formControlName="party_id"/>
+                        <input class="form-control" id="party_id" name="party_id" placeholder="Party ID" required
+                               formControlName="party_id"/>
                       </div>
                       <div class="form-group">
                         <label for="image">Image URL:</label>
-                        <input class="form-control" id="image" name="image" placeholder="Image URL" required formControlName="image"/>
+                        <input class="form-control" id="image" name="image" placeholder="Image URL" required
+                               formControlName="image"/>
                       </div>
                       <div class="form-group">
                         <label for="constituency_id">Constituency ID:</label>
-                        <input class="form-control" id="constituency_id" name="constituency_id" placeholder="Constituency ID" required formControlName="constituency_id"/>
+                        <input class="form-control" id="constituency_id" name="constituency_id"
+                               placeholder="Constituency ID" required formControlName="constituency_id"/>
                       </div>
                       <div class="form-group">
                         <label for="statement">Statement:</label>
-                        <input class="form-control" id="statement" name="statement" placeholder="Statement" required formControlName="statement"/>
+                        <input class="form-control" id="statement" name="statement" placeholder="Statement" required
+                               formControlName="statement"/>
                       </div>
-                      <button type="submit" class="btn btn-primary" [disabled]="candidateFormGroup.invalid">Save</button>
-                      <button type="button" class="btn btn-secondary" (click)="candidate.showForm = false">Cancel</button>
+                      <div class="btn-group" style="padding-top: 10px">
+                          <button type="submit" class="btn btn-primary" [disabled]="candidateFormGroup.invalid">Save</button>
+                          <button type="button" class="btn btn-secondary mr-2" (click)="onEditButtonClick(candidate.candidate_id);">Cancel</button>
+                      </div>
                     </form>
                   </div>
-                  </div>
-                </div>
               </div>
             </div>
-            <div class="col">
-              <div class="row g-0" style="justify-content: right">
-                <div class="col-md-8">
-                  <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="onEditButtonClick(candidate.candidate_id); createCandidateForm(candidate)" >Edit</button>
-                    <button type="button" class="btn btn-danger" (click)="onCandidateDelete(candidate)">Delete</button>
-                  </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-body">
+              <div class="row justify-content-end">
+                <div class="col-auto">
+                  <button type="button" class="btn btn-secondary" style="margin-right: 10px"
+                          (click)="onEditButtonClick(candidate.candidate_id); createCandidateForm(candidate)"><i
+                    class="fa fa-edit"></i></button>
+                  <button type="button" class="btn btn-danger" (click)="onCandidateDelete(candidate)"><i
+                    class="fa fa-trash"></i></button>
                 </div>
               </div>
             </div>
@@ -57,54 +77,72 @@
         </div>
       </div>
     </div>
-
   </div>
- <div class="container" *ngIf="isAdmin">
-    <h1 style="padding: 10px">Parties</h1>
-    <div class="row">
-      <div class="col-md-6" *ngFor="let party of party_list | async">
-        <div class="card mb-3">
-           <div class="row align-items-start">
-            <div class="col">
-              <div class="row g-0">
-                <div class="col-md-8">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ party.party_name }}</h5>
-                    <div *ngIf="currentlyOpenFormId === party.party_id">
+</div>
+
+<div class="container" *ngIf="isAdmin">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <h1 style="padding: 10px">Parties</h1>
+  <div class="row">
+    <div class="col-md-5" *ngFor="let party of party_list | async">
+      <div class="card mb-3">
+        <div class="row align-items-center">
+          <div class="col-md-3">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-12">
+                  <img src="{{party.image}}" style="width: 50px; height: 50px; border-radius: 50%" alt="">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-12">
+                  <h5 class="card-title">{{ party.party_name }}</h5>
+                </div>
+                <div *ngIf="currentlyOpenFormId === party.party_id">
                     <form [formGroup]="partyFormGroup" (ngSubmit)="onPartySubmit(partyFormGroup.value, party)">
                       <div class="form-group">
                         <label for="party_name">Image URL:</label>
-                        <input class="form-control" id="party_name" name="party_name" placeholder="Party Name" required formControlName="party_name"/>
+                        <input class="form-control" id="party_name" name="party_name" placeholder="Party Name" required
+                               formControlName="party_name"/>
                       </div>
                       <div class="form-group">
                         <label for="image">Image URL:</label>
-                        <input class="form-control" id="party_image" name="image" placeholder="Image URL" required formControlName="image"/>
+                        <input class="form-control" id="party_image" name="image" placeholder="Image URL" required
+                               formControlName="image"/>
                       </div>
                       <div class="form-group">
                         <label for="manifesto">Manifesto:</label>
-                        <input class="form-control" id="manifesto" name="manifesto" placeholder="Manifesto" required formControlName="manifesto"/>
+                        <input class="form-control" id="manifesto" name="manifesto" placeholder="Manifesto" required
+                               formControlName="manifesto"/>
                       </div>
-                      <button type="submit" class="btn btn-primary" [disabled]="partyFormGroup.invalid">Save</button>
-                      <button type="button" class="btn btn-secondary" (click)="party.showForm = false">Cancel</button>
+                      <div class="btn-group" style="padding-top: 10px">
+                        <button type="submit" class="btn btn-primary" [disabled]="partyFormGroup.invalid">Save</button>
+                        <button type="button" class="btn btn-secondary mr-2" (click)="onEditButtonClick(party.party_id);">Cancel</button>
+                      </div>
                     </form>
-                    </div>
                   </div>
-                </div>
               </div>
             </div>
-            <div class="col">
-              <div class="row g-0" style="justify-content: right">
-                <div class="col-md-8">
-                  <div class="card-body">
-                    <button type="button" class="btn btn-secondary" style="margin-right: 10px" (click)="onEditButtonClick(party.party_id); createPartyForm(party)">Edit</button>
-                    <button type="button" class="btn btn-danger" (click)="onPartyDelete(party)">Delete</button>
-                  </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card-body">
+              <div class="row justify-content-end">
+                <div class="col-auto">
+                  <button type="button" class="btn btn-secondary" style="margin-right: 10px"
+                          (click)="onEditButtonClick(party.party_id); createPartyForm(party)"><i
+                    class="fa fa-edit"></i></button>
+                  <button type="button" class="btn btn-danger" (click)="onPartyDelete(party)"><i
+                    class="fa fa-trash"></i></button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
+</div>
