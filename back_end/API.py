@@ -307,12 +307,12 @@ def delete_party(id):
     party = session.query(Party).filter_by(party_id=id).first()
 
     if not party:
-        return make_response('Party not found', 404)
+        return make_response(jsonify({'message': 'Party not found'}), 404)
 
     session.delete(party)
     session.commit()
 
-    return make_response('Party deleted', 200)
+    return make_response(jsonify({'message': 'Party deleted'}), 200)
 
 
 @app.route("/api/v1.0/candidates", methods=["GET"])
@@ -446,12 +446,12 @@ def delete_candidate(id):
     candidate = session.query(Candidate).filter_by(candidate_id=id).first()
 
     if not candidate:
-        return make_response("Candidate not found", 404)
+        return make_response(jsonify({'message': 'Candidate not found'}), 404)
 
     session.delete(candidate)
     session.commit()
 
-    return make_response('Candidate deleted', 200)
+    return make_response(jsonify({'message': 'Candidate deleted'}), 200)
 
 
 @app.route("/api/v1.0/voters", methods=["GET"])
