@@ -4,7 +4,8 @@ import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'voting-data',
-  templateUrl: './voting-data.component.html'
+  templateUrl: './voting-data.component.html',
+  styleUrls: ['./voting-data.component.css']
 })
 export class VotingDataComponent implements OnInit {
   votingData: any[] = [];
@@ -26,9 +27,9 @@ export class VotingDataComponent implements OnInit {
     const candidateNames = this.votingData.map(candidate => candidate.candidate_name);
     const colors = this.getColours(candidateNames.length);
       this.votingPieChart = new Chart("votingPieChart", {
-        type: 'doughnut', //this denotes tha type of chart
+        type: 'doughnut',
 
-        data: {// values on X-Axis
+        data: {
           labels: candidateNames,
            datasets: [
             {
@@ -48,9 +49,9 @@ export class VotingDataComponent implements OnInit {
     const candidateNames = this.votingData.map(candidate => candidate.candidate_name);
     const colors = this.getColours(candidateNames.length);
       this.votingBarChart = new Chart("votingBarChart", {
-        type: 'bar', //this denotes tha type of chart
+        type: 'bar',
 
-        data: {// values on X-Axis
+        data: {
           labels: candidateNames,
            datasets: [
             {
