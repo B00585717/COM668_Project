@@ -22,7 +22,7 @@ body {
 content: "";
 flex: 1;
 height: 1px;
-background: #eee;
+background: #060a0e;
 }
 .h-custom {
 height: calc(100% - 73px);

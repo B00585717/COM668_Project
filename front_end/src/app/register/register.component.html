@@ -9,14 +9,24 @@
           <div class="form-group">
             <label class="control-label col-sm-2" for="first_name">First Name:</label>
             <input type="text" class="form-control" id="first_name" name="first_name" formControlName="first_name" placeholder="Enter First Name">
+            <div *ngIf="registrationForm.get('first_name').invalid && (registrationForm.get('first_name').dirty || registrationForm.get('first_name').touched)" class="text-danger">
+              <div *ngIf="registrationForm.get('first_name').errors.required">First Name is required</div>
+            </div>
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="last_name">Last Name:</label>
             <input type="text" class="form-control" id="last_name" name="last_name" formControlName="last_name" placeholder="Enter Last Name">
+            <div *ngIf="registrationForm.get('last_name').invalid && (registrationForm.get('last_name').dirty || registrationForm.get('last_name').touched)" class="text-danger">
+              <div *ngIf="registrationForm.get('last_name').errors.required">Last Name is required</div>
+            </div>
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="postcode">Postcode:</label>
             <input type="text" class="form-control" id="postcode" name="last_name" formControlName="postcode" placeholder="Enter Postcode">
+            <div *ngIf="registrationForm.get('postcode').invalid && (registrationForm.get('postcode').dirty || registrationForm.get('postcode').touched)" class="text-danger">
+              <div *ngIf="registrationForm.get('postcode').errors.required">Postcode is required</div>
+              <div *ngIf="registrationForm.get('postcode').errors.pattern">Must be a valid Postcode</div>
+            </div>
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="email">Email:</label>
@@ -25,10 +35,16 @@
           <div class="form-group">
             <label class="control-label col-sm-2" for="password">Password:</label>
             <input type="password" class="form-control" id="password" name="password" formControlName="password" placeholder="Enter password">
+            <div *ngIf="registrationForm.get('password').invalid && (registrationForm.get('password').dirty || registrationForm.get('password').touched)" class="text-danger">
+              <div *ngIf="registrationForm.get('password').errors.required">Password is required</div>
+            </div>
           </div>
           <div class="form-group">
             <label class="control-label col-sm-2" for="otp">OTP:</label>
             <input type="otp" class="form-control" id="otp" name="password" formControlName="otp" placeholder="Enter OTP">
+            <div *ngIf="registrationForm.get('otp').invalid && (registrationForm.get('otp').dirty || registrationForm.get('otp').touched)" class="text-danger">
+              <div *ngIf="registrationForm.get('otp').errors.required">OTP is required</div>
+            </div>
           </div>
 
           <ngx-recaptcha2 [siteKey]="siteKey" formControlName="recaptcha"></ngx-recaptcha2>

@@ -16,6 +16,7 @@ export class RegisterComponent {
   registrationForm: any;
   public siteKey: any;
   email: any;
+  postcode_regex = '^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([AZa-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$'
 
   constructor(public webService: WebService, private router: Router, private formBuilder: FormBuilder, private http: HttpClient, private emailService: EmailService) {
   }
@@ -29,7 +30,7 @@ export class RegisterComponent {
       last_name: ['', Validators.required],
       email: [emailFromVerification || '', Validators.required],
       password: ['', Validators.required],
-      postcode: ['', Validators.required],
+      postcode: ['', Validators.pattern(this.postcode_regex)],
       otp: ['', Validators.required],
       recaptcha: ['', Validators.required]
     });

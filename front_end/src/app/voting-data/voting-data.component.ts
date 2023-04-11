@@ -46,6 +46,7 @@ export class VotingDataComponent implements OnInit {
 
   createBarChart(){
     const candidateNames = this.votingData.map(candidate => candidate.candidate_name);
+    const colors = this.getColours(candidateNames.length);
       this.votingBarChart = new Chart("votingBarChart", {
         type: 'bar', //this denotes tha type of chart
 
@@ -54,7 +55,8 @@ export class VotingDataComponent implements OnInit {
            datasets: [
             {
               label: "Vote Percentage",
-              data: this.votingData.map(candidate => candidate.vote_percentage)
+              data: this.votingData.map(candidate => candidate.vote_percentage),
+              backgroundColor: colors
             },
           ]
         },
