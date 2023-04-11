@@ -25,6 +25,8 @@ export class LoginComponent {
         this.authService.getIsAdmin()
 
         this.authService.setVoterId(loggedInUserData.voter_id);
+        this.authService.setGovId(loggedInUserData.gov_id);
+        console.log(loggedInUserData.gov_id)
 
         sessionStorage.setItem('access_token', response.access_token);
       },

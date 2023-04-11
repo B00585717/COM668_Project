@@ -7,7 +7,6 @@ export class WebService {
 
   private partyId: any;
   private candidateId: any;
-  private voterId: any;
 
 constructor(private http: HttpClient) {}
 
@@ -70,8 +69,10 @@ constructor(private http: HttpClient) {}
       response => console.log('Access token revoked'),
       error => console.error('Error revoking access token', error)
     );
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('voter_id');
     localStorage.removeItem('access_token');
-    localStorage.removeItem('voter_id')
   }
 
   updateParty(party: any){
@@ -92,10 +93,13 @@ constructor(private http: HttpClient) {}
   }
 
   updatePassword(g_id: string,email: string, newPassword: string) {
+  const headers = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+  });
     const formData = new FormData();
     formData.append('password', newPassword);
     formData.append('email', email)
-    return this.http.put("http://localhost:5000/api/v1.0/profile/"+ g_id , formData);
+    return this.http.put("http://localhost:5000/api/v1.0/profile/"+ g_id , formData, { headers: headers });
   }
 
 

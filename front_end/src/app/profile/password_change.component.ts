@@ -13,15 +13,16 @@ export class Password_changeComponent {
 
   constructor(private webService: WebService, private authService: AuthService) {}
 
-updatePassword() {
-const g_id = this.authService.getUser().gov_id;
-  this.webService.updatePassword(g_id, this.email, this.newPassword).subscribe(
-    (response) => {
-      console.log('Password successfully updated:', response);
-    },
-    (error) => {
-      console.error('Error updating password:', error);
-    }
-  );
-}
+  updatePassword() {
+    const g_id = this.authService.getGovId();
+    console.log(this.authService.getGovId())
+    this.webService.updatePassword(g_id, this.email, this.newPassword).subscribe(
+      (response) => {
+        console.log('Password successfully updated:', response);
+      },
+      (error) => {
+        console.error('Error updating password:', error);
+      }
+    );
+  }
 }

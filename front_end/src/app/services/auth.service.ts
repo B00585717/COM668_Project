@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +17,7 @@ export class AuthService {
 
   private user: any;
   private voter_id: any;
+  private gov_id: any;
 
   constructor() {}
 
@@ -27,12 +28,22 @@ export class AuthService {
   }
 
   setUser(userData: any) {
-    this.user = userData;
+    this._userData.next(userData);
     this.setIsAdmin(userData.isAdmin);
   }
 
   getUser() {
     return this._userData.getValue();
+  }
+
+  getGovId(): any {
+    return localStorage.getItem('govId');
+  }
+
+  public setGovId(gov_id: boolean) {
+    this.gov_id = gov_id
+    localStorage.setItem('govId', gov_id.toString());
+
   }
 
   public setLoggedIn(loggedIn: boolean) {
