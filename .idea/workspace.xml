@@ -8,14 +8,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="74b89a82-818f-4139-b0db-7cbae60f974a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back_end/API.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/API.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back_end/Models.py" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/Models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/src/app/party/party.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/party/party.component.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front_end/src/app/party/party.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/party/party.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back_end/token.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/back_end/token.pickle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/admin/admin.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/admin/admin.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/admin/admin.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/admin/admin.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/app.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/app.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/app.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/app.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/candidate/candidate.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/candidate/candidate.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/candidate/candidate.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/candidate/candidate.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/candidate/candidate.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/candidate/candidate.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/candidates/candidates.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/candidates/candidates.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/candidates/candidates.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/candidates/candidates.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/candidates/candidates.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/candidates/candidates.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/home/home.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/home/home.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/nav/nav.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/nav/nav.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/nav/nav.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/nav/nav.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/parties/parties.component.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/parties/parties.component.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/parties/parties.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/parties/parties.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/profile/profile.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/profile/profile.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/profile/profile.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/profile/profile.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/app/voting-data/voting-data.component.html" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/app/voting-data/voting-data.component.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/front_end/src/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,11 +90,11 @@
       <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem\front_end\src\app" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem\front_end\src\app\faq" />
+      <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem\front_end\src\app\home" />
       <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem\front_end" />
       <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem\front_end\src\app\voting-data" />
       <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem\front_end\src\app\services" />
-      <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem\back_end" />
-      <recent name="C:\Users\rcole\OneDrive\Desktop\OnlineElectionSystem" />
     </key>
   </component>
   <component name="RunManager" selected="Python.API">
@@ -231,7 +245,7 @@
       <workItem from="1680848895810" duration="9946000" />
       <workItem from="1680947387478" duration="19773000" />
       <workItem from="1681034644273" duration="53567000" />
-      <workItem from="1681212876017" duration="3097000" />
+      <workItem from="1681212876017" duration="19738000" />
     </task>
     <servers />
   </component>
@@ -253,7 +267,7 @@
     <SUITE FILE_PATH="coverage/COM668$APIsss.coverage" NAME="APIsss Coverage Results" MODIFIED="1680715587079" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/OnlineElectionSystem$.coverage" NAME=" Coverage Results" MODIFIED="1681212928627" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/back_end" />
     <SUITE FILE_PATH="coverage/COM668$API__1_.coverage" NAME="API (1) Coverage Results" MODIFIED="1679769803568" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/OnlineElectionSystem$API.coverage" NAME="API Coverage Results" MODIFIED="1681215972663" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/back_end" />
+    <SUITE FILE_PATH="coverage/OnlineElectionSystem$API.coverage" NAME="API Coverage Results" MODIFIED="1681230803445" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/back_end" />
     <SUITE FILE_PATH="coverage/COM668$Constituencies__1_.coverage" NAME="Constituencies (1) Coverage Results" MODIFIED="1680634118625" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/COM668$GoogleAPI.coverage" NAME="GoogleAPI Coverage Results" MODIFIED="1680081712691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pythonProject$main.coverage" NAME="main Coverage Results" MODIFIED="1679670460772" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

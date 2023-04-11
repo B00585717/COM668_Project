@@ -1,62 +1,54 @@
-<section style="background-color: #eee;">
-  <div class="container py-5" style="height: 810px; margin-left: 400px">
-    <div class="col-md-8">
-      <div class="tab-content profile-tab" id="myTabContent">
-        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab"
-             *ngIf="profile; else elseBlock">
-          <div class="row">
-            <h2>Profile</h2>
-            <div class="col-md-6">
-              <label>First Name:</label>
-            </div>
-            <div class="col-md-6">
-              <p>{{profile.first_name}}</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <label>Last Name</label>
-            </div>
-            <div class="col-md-6">
-              <p>{{profile.last_name}}</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <label>Email</label>
-            </div>
-            <div class="col-md-6">
-              <p>{{profile.email}}</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <label>Government ID:</label>
-            </div>
-            <div class="col-md-6">
-              <p>{{profile.gov_id}}</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <label>Constituency</label>
-            </div>
-            <div class="col-md-6">
-              <p>{{profile.constituency_name}}</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <label>Password</label>
-            </div>
-            <div class="col-md-6">
-              <button routerLink='/profile/{{profile.gov_id}}' class="btn btn-secondary">Change Password</button>
-            </div>
-          </div>
-          <button *ngIf="isAdmin" routerLink="/admin">Go to Admin Page</button>
-        </div>
-      </div>
-      <ng-template #elseBlock>Must Login to View Profile</ng-template>
-    </div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="profile.component.css">
+</head>
+<body>
+<div class="navbar-top">
+  <div class="title">
+    <h1>Profile</h1>
   </div>
-</section>
+</div>
+<div class="main">
+  <h2>IDENTITY</h2>
+  <div class="card" style="margin-right: 300px">
+    <div class="card-body">
+      <table>
+        <tbody *ngIf="profile; else elseBlock">
+        <tr>
+          <td>Name:</td>
+          <td></td>
+          <td>{{profile.first_name}} {{profile.last_name}}</td>
+        </tr>
+        <tr>
+          <td>Email:</td>
+          <td></td>
+          <td>{{profile.email}}</td>
+        </tr>
+        <tr>
+          <td>Constituency:</td>
+          <td></td>
+          <td>{{profile.constituency_name}}</td>
+        </tr>
+        <tr>
+          <td>Government ID:</td>
+          <td></td>
+          <td>{{profile.gov_id}}</td>
+        </tr>
+        <tr>
+          <td>Password:</td>
+          <td></td>
+          <td><button routerLink='/profile/{{profile.gov_id}}' class="btn btn-secondary">Change Password</button></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+<ng-template #elseBlock>Must Login to See Profile</ng-template>
+</html>

@@ -1,33 +1,49 @@
-<section style="background-color: #eee;">
-  <div class="container py-5" style="height: 810px" *ngFor="let candidate of candidate_list | async">
-      <div class="row">
-        <div class="col-lg-4">
-          <div class="card mb-4">
-            <div class="card-body text-center">
-              <img src="{{candidate.image}}" alt="avatar"
-                class="rounded-circle img-fluid" style="width: 150px;">
-              <h5 class="my-3">{{candidate.candidate_firstname}} {{candidate.candidate_lastname}}</h5>
-              <p class="text-muted mb-1">{{candidate.party_name}}</p>
-              <p class="text-muted mb-4">{{candidate.constituency_name}}</p>
-            </div>
-          </div>
-          <div class="card mb-4 mb-lg-0">
-            <div class="card-body p-0">
-              <ul class="list-group list-group-flush rounded-3">
-                <img src="{{candidate.party_image}}">
-              </ul>
-            </div>
-          </div>
-      </div>
-      <div class="col-lg-8">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h2>Statement</h2>
-              {{candidate.statement}}
-            </div>
-          </div>
-
-      </div>
-    </div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="candidate.component.css">
+</head>
+<body *ngIf="candidate">
+<div class="navbar-top">
+  <div class="title">
+    <h1>{{candidate.candidate_firstname}} {{candidate.candidate_lastname}}</h1>
   </div>
-</section>
+</div>
+<div class="image-container">
+  <img src="{{candidate.image}}" alt="Candidate Image" style="margin-top: 120px">
+</div>
+<div class="main">
+  <div class="card" style="margin-right: 200px; margin-top: 150px">
+    <div class="card-body">
+      <table>
+        <tbody>
+        <tr>
+          <td>Name:</td>
+          <td></td>
+          <td>{{candidate.candidate_firstname}} {{candidate.candidate_lastname}}</td>
+        </tr>
+        <tr>
+          <td>Party:</td>
+          <td></td>
+          <td>{{candidate.party_name}}</td>
+        </tr>
+        <tr>
+          <td>Constituency:</td>
+          <td></td>
+          <td>{{candidate.constituency_name}}</td>
+        <tr>
+          <td>Statement:</td>
+          <td></td>
+          <td>{{candidate.statement}}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,28 +1,68 @@
-html,body {
-        padding:0;
-        margin:0;
-        height:100%;
-        min-height:100%;
-      }
-
-
-
-.quad{
-width:50%;
-height:100%;
-float:left;
-}
-.line{
-height:50%;
-width:100%;
+.main {
+    margin-top: 2%;
+    margin-left: 29%;
+    font-size: 28px;
+    padding: 0 10px;
+    width: 58%;
 }
 
+.main h2 {
+    font-family: 'Century Gothic', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
 
-.equal, .equal > div[class*='col-'] {
-      display: -webkit-box;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-      flex:1 0 auto;
-  }
+.main .card {
+    border-radius: 18px;
+    box-shadow: 1px 1px 8px 0 grey;
+    height: auto;
+    margin-bottom: 20px;
+    padding: 20px 0 20px 50px;
+}
+
+.main .card table {
+    border: none;
+    font-size: 16px;
+    height: 270px;
+    width: 80%;
+}
+
+body {
+    background-color: #e8f5ff;
+    font-family: "Century Gothic";
+    overflow: hidden;
+}
+
+/* NavbarTop */
+.navbar-top {
+    background-color: #fff;
+
+    box-shadow: 0px 4px 8px 0px grey;
+    height: 70px;
+}
+
+.title {
+    font-family: 'Century Gothic', cursive;
+    padding-top: 15px;
+    position: absolute;
+    left: 45%;
+}
+
+.navbar-top ul {
+    float: right;
+    list-style-type: none;
+    margin: 0;
+    overflow: hidden;
+    padding: 18px 50px 0 40px;
+}
+
+.navbar-top ul li {
+    float: left;
+}
+
+.navbar-top ul li a {
+
+    padding: 14px 16px;
+    text-align: center;
+    text-decoration: none;
+}

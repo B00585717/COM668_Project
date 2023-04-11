@@ -12,6 +12,7 @@ import {FormBuilder} from "@angular/forms";
 export class PartyComponent {
 
   party_list: any = [];
+  party: any;
 
    constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
   }

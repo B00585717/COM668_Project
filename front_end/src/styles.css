@@ -1,9 +1,20 @@
 /* You can add global styles to this file, and also import other style files */
 .page-wrapper {
+  background-color: #e8f5ff;
   display: flex;
 }
 
+html, body  {
+    background-color: #e8f5ff;
+    font-family: "Century Gothic", serif;
+}
 main {
+  background-color: #e8f5ff;
   flex-grow: 1;
   margin-left: 225px; /* Adjust the padding as needed */
+}
+
+.container{
+      background-color: #e8f5ff;
+    font-family: "Century Gothic", serif;
 }

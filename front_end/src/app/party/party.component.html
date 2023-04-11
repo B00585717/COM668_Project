@@ -1,25 +1,41 @@
-<section style="background-color: #eee;">
-
-  <div class="container-fluid container py-5" style="height: 810px">
-      <div class="row">
-        <div class="col-lg-4">
-          <div class="card mb-4 mb-lg-0">
-            <div class="card-body p-0">
-              <ul class="list-group list-group-flush rounded-3">
-                <img src="{{party_list.image}}">
-              </ul>
-            </div>
-          </div>
-      </div>
-      <div class="col-lg-8">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h2>{{party_list.party_name}} Manifesto</h2>
-              {{party_list.manifesto}}
-            </div>
-          </div>
-
-      </div>
-    </div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="party.component.css">
+</head>
+<body>
+<div class="navbar-top">
+  <div class="title">
+    <h1>{{party_list.party_name}}</h1>
   </div>
-</section>
+</div>
+<div class="image-container">
+  <img src="{{party_list.image}}" alt="Party Image" style="margin-top: 120px">
+</div>
+<div class="main">
+  <div class="card" style="margin-right: 200px; margin-top: 150px">
+    <div class="card-body">
+      <table>
+        <tbody>
+        <tr>
+          <td>Name:</td>
+          <td></td>
+          <td><b>{{party_list.party_name}}</b></td>
+        </tr>
+        <tr>
+          <td>Manifesto:</td>
+          <td></td>
+          <td>{{party_list.manifesto}}</td>
+        </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>

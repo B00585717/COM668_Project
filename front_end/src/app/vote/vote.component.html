@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="background-color: #e8f5ff;">
+  <div class="container">
+    <h1 style="padding: 10px">Candidates</h1>
+    <div class="row" *ngIf="voter_id; else elseBlock">
+      <div class="col-md-6" *ngFor="let candidate of candidate_list | async">
+        <div class="card mb-3">
+          <div class="row g-0">
+            <div class="card">
+              <img src="{{candidate.image}}" style="width:100%">
+              <h1>{{candidate.candidate_firstname}}</h1>
+              <h1>{{candidate.candidate_lastname}}</h1>
+              <p class="title">{{candidate.party_name}}</p>
+              <p><button *ngIf="voter_id" (click)="onVoteButtonClick(candidate.candidate_id)">Vote</button></p>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<ng-template #elseBlock>Must Login to Vote</ng-template>
+</body>
+
+</html>
+

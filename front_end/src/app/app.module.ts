@@ -24,6 +24,8 @@ import {NavComponent} from "./nav/nav.component";
 import {Password_changeComponent} from "./profile/password_change.component";
 import {AdminComponent} from "./admin/admin.component";
 import {VotingDataComponent} from "./voting-data/voting-data.component";
+import {VoteComponent} from "./vote/vote.component";
+import {FAQComponent} from "./faq/faq.component";
 
 
 var routes: any = [
@@ -78,6 +80,18 @@ var routes: any = [
   {
     path: 'voting-data',
     component: VotingDataComponent
+  },
+  {
+    path: 'vote',
+    component: VoteComponent
+  },
+  {
+    path: 'vote',
+    component: VoteComponent
+  },
+  {
+    path: 'faq',
+    component: FAQComponent
   }
 
   ]
@@ -99,7 +113,9 @@ var routes: any = [
     NavComponent,
     Password_changeComponent,
     AdminComponent,
-    VotingDataComponent
+    VotingDataComponent,
+    VoteComponent,
+    FAQComponent
   ],
   imports: [
     BrowserModule,

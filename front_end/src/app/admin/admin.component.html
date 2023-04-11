@@ -1,5 +1,11 @@
-<div class="container" *ngIf="isAdmin">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+<link rel="stylesheet" href="admin.component.css">
+<body>
+<div class="navbar-top">
+  <div class="title">
+    <h1>Administration</h1>
+  </div>
+</div>
+<div class="container" *ngIf="isAdmin" style="margin-top: 50px">
   <h1 style="padding: 10px">Candidates <button type="button" class="btn btn-outline-success" style="margin-right: 10px"><i class="fa fa-plus" (click)="toggleAddCandidateForm()"></i></button></h1>
   <form [formGroup]="candidateFormGroup" (submit)="addCandidate(candidateFormGroup.value)" *ngIf="showAddCandidateForm">
     <div class="form-group">
@@ -196,3 +202,4 @@
     </div>
   </div>
 </div>
+</body>

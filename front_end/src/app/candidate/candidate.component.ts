@@ -11,29 +11,21 @@ import {WebService} from "../services/web.service";
 
 export class CandidateComponent {
 
-  candidate_list: any = [];
+  candidate: any;
 
-  candidate_form: any;
 
   constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
   }
 
-  ngOnInit() {
-    this.candidate_list = this.webService.getCandidate(this.route.snapshot.params['id']);
-
-  }
-  onSubmit() {
-    this.webService.updateCandidate(this.candidate_form.value).subscribe((response: any) => {
-      this.candidate_form.reset();
-    });
-
-    this.candidate_form = this.formBuilder.group({
-      candidate_firstname: this.candidate_list.candidate_firstname,
-      candidate_lastname: '',
-      party_id: '',
-      image: '',
-      constituency_id: '',
-      statement:'',
-    });
-  }
+ngOnInit() {
+  this.webService.getCandidate(this.route.snapshot.params['id']).subscribe(
+    (candidateData: any) => {
+      console.log("Candidate data received:", candidateData);
+      this.candidate = candidateData[0];
+    },
+    (error) => {
+      console.error("Error fetching candidate data:", error);
+    }
+  );
+}
 }

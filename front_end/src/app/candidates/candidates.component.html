@@ -1,23 +1,22 @@
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
 <body>
-  <div class="container">
-    <h1 style="padding: 10px">Candidates</h1>
+<div class="navbar-top">
+  <div class="title">
+    <h1>Candidates</h1>
+  </div>
+</div>
+    <div class="container-lg">
     <div class="row">
-      <div class="col-md-6" *ngFor="let candidate of candidate_list | async">
-        <div class="card mb-3">
-          <div class="row g-0">
+      <div class="col-md-6" *ngFor="let candidate of candidate_list | async" style="margin-top: 50px">
+        <div class="card" style="margin-right: 50px;">
+          <div class="row">
             <div class="col-md-4">
-              <img src="{{ candidate.image }}" alt="Profile Picture" class="img-fluid" [routerLink]="['/candidates/'+ candidate.candidate_id]" style="cursor: pointer">
-              <p class="card-text text-center"><small class="text-muted" routerLink="/parties/{{candidate.party_id}}" style="cursor: pointer">{{ candidate.party_name }}</small></p>
-               <button *ngIf="voter_id" (click)="onVoteButtonClick(candidate.candidate_id)" style="margin-left: 20px" class="btn btn-secondary">Vote for candidate</button>
+              <img src="{{ candidate.image }}" alt="Profile Picture" class="img-fluid" [routerLink]="['/candidates/'+ candidate.candidate_id]" style="cursor: pointer" >
+              <p style="margin-left: 35px; cursor: pointer" [routerLink]="['/parties/'+ candidate.party_id]">{{ candidate.party_name }}</p>
             </div>
             <div class="col-md-8">
               <div class="card-body">
-                <h5 class="card-title">{{ candidate.candidate_firstname }} {{candidate.candidate_lastname}}</h5>
+                <h5 class="card-title"><b>{{ candidate.candidate_firstname }} {{ candidate.candidate_lastname}}</b></h5>
                 <p class="card-text">{{ candidate.statement }}</p>
               </div>
             </div>
