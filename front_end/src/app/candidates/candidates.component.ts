@@ -14,7 +14,6 @@ import { AuthService } from '../services/auth.service';
 export class CandidatesComponent {
 
   candidate_list: any = [];
-  candidate_form: any;
   voter_id: any;
 
   constructor(public webService: WebService,
@@ -45,21 +44,6 @@ export class CandidatesComponent {
       } else {
         this.voter_id = null;
       }
-    });
-  }
-
-  onSubmit() {
-    this.webService.addCandidate(this.candidate_form.value).subscribe((response: any) => {
-      this.candidate_form.reset();
-    });
-
-    this.candidate_form = this.formBuilder.group({
-      candidate_firstname: '',
-      candidate_lastname: '',
-      party_id: '',
-      image: '',
-      constituency_id: '',
-      statement:'',
     });
   }
 }

@@ -1,12 +1,12 @@
 <section style="background-color: #eee;">
 
-  <div class="container-fluid container py-5" style="height: 810px" *ngFor="let party of party_list | async">
+  <div class="container-fluid container py-5" style="height: 810px">
       <div class="row">
         <div class="col-lg-4">
           <div class="card mb-4 mb-lg-0">
             <div class="card-body p-0">
               <ul class="list-group list-group-flush rounded-3">
-                <img src="{{party.image}}">
+                <img src="{{party_list.image}}">
               </ul>
             </div>
           </div>
@@ -14,8 +14,8 @@
       <div class="col-lg-8">
           <div class="card mb-4">
             <div class="card-body">
-              <h2>{{party.party_name}} Manifesto</h2>
-              {{party.manifesto}}
+              <h2>{{party_list.party_name}} Manifesto</h2>
+              {{party_list.manifesto}}
             </div>
           </div>
 

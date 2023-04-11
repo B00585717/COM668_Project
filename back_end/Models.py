@@ -65,12 +65,14 @@ class Candidate(Base):
     candidate_id = Column(Integer, primary_key=True)
     candidate_firstname = Column(String, unique=False, nullable=False)
     candidate_lastname = Column(String, unique=False, nullable=False)
-    party_id = Column(Integer, unique=False, nullable=False)
+    party_id = Column(Integer, ForeignKey('Party.party_id'), nullable=False)
     vote_count = Column(Integer, unique=False, nullable=True)
     image = Column(String, unique=False, nullable=False)
-    constituency_id = Column(Integer, unique=False, nullable=True)
+    constituency_id = Column(Integer, ForeignKey('Constituency.constituency_id'), nullable=True)
     statement = Column(String, unique=False, nullable=False)
 
+    party = relationship("Party")
+    constituency = relationship("Constituency")
     votes = relationship("Votes", back_populates="candidate")
 
 

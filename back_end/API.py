@@ -2,7 +2,7 @@ import random
 import re
 from functools import wraps
 
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, joinedload
 import GoogleAPI
 import bcrypt
 from datetime import timedelta
@@ -23,8 +23,6 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 CORS(app)
 
 jwt = JWTManager(app)
-SQLdb = DBConfig()
-cursor = SQLdb.get_cursor()
 
 # Create a session factory
 Session = sessionmaker(bind=engine)
@@ -229,15 +227,18 @@ def show_all_parties():
 
 @app.route("/api/v1.0/parties/<id>", methods=["GET"])
 def show_one_party(id):
-    data_to_return = []
-    query = "SELECT * FROM Party WHERE party_id = ?"
-    cursor.execute(query, (id,))
-    for row in cursor.fetchall():
-        item_dict = {"party_id": row[0],
-                     "party_name": row[1],
-                     "image": row[2],
-                     "manifesto": row[3]}
-        data_to_return.append(item_dict)
+    party = session.query(Party).filter(Party.party_id == id).first()
+
+    if not party:
+        return make_response(jsonify({"error": "Party not found"}), 404)
+
+    data_to_return = {
+        "party_id": party.party_id,
+        "party_name": party.party_name,
+        "image": party.image,
+        "manifesto": party.manifesto
+    }
+
     return make_response(jsonify(data_to_return), 200)
 
 
@@ -346,21 +347,28 @@ def show_all_candidates():
 @app.route("/api/v1.0/candidates/<id>", methods=["GET"])
 def show_one_candidate(id):
     data_to_return = []
-    query = "SELECT Candidate.*,Party.party_name, Party.image, Constituency.constituency_name " \
-            "FROM Candidate " \
-            "JOIN Party ON " \
-            "Candidate.party_id=party.party_id JOIN Constituency ON Candidate.constituency_id = Constituency.constituency_id WHERE candidate_id = ?"
-    cursor.execute(query, id)
-    for row in cursor.fetchall():
-        item_dict = {"candidate_id": row[0],
-                     "candidate_firstname": row[1],
-                     "candidate_lastname": row[2],
-                     "party_id": row[3],
-                     "image": row[5],
-                     "statement": row[7],
-                     "party_name": row[8],
-                     "party_image": row[9],
-                     "constituency_name": row[10]}
+
+    # Query using ORM
+    candidate = (
+        session.query(Candidate, Party, Constituency)
+        .options(joinedload(Candidate.party), joinedload(Candidate.constituency))
+        .filter(Candidate.candidate_id == id)
+        .first()
+    )
+
+    if candidate:
+        cand, party, constituency = candidate
+        item_dict = {
+            "candidate_id": cand.candidate_id,
+            "candidate_firstname": cand.candidate_firstname,
+            "candidate_lastname": cand.candidate_lastname,
+            "party_id": party.party_id,
+            "image": cand.image,
+            "statement": cand.statement,
+            "party_name": party.party_name,
+            "party_image": party.image,
+            "constituency_name": constituency.constituency_name,
+        }
         data_to_return.append(item_dict)
     return make_response(jsonify(data_to_return), 200)
 
