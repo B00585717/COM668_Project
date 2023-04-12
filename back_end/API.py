@@ -1,10 +1,9 @@
 import random
 import re
-from functools import wraps
-
-from sqlalchemy.orm import sessionmaker, joinedload
 import GoogleAPI
 import bcrypt
+from functools import wraps
+from sqlalchemy.orm import sessionmaker, joinedload
 from datetime import timedelta
 from random import randint
 from decouple import config
@@ -12,7 +11,7 @@ from flask import Flask, request, jsonify, make_response, json
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from DBConfig import DBConfig
 from flask_cors import CORS
-from Models import Voter, Verification, Party, Candidate, engine, Constituency, Votes
+from Models import Voter, Verification, Party, Candidate, engine, Constituency, Votes, VoteType
 from sqlalchemy import func
 
 app = Flask(__name__)
@@ -350,10 +349,10 @@ def show_all_candidates():
 def show_one_candidate(id):
     data_to_return = []
 
-    # Query using ORM
     candidate = (
         session.query(Candidate, Party, Constituency)
-        .options(joinedload(Candidate.party), joinedload(Candidate.constituency))
+        .join(Party, Candidate.party_id == Party.party_id)
+        .join(Constituency, Candidate.constituency_id == Constituency.constituency_id)
         .filter(Candidate.candidate_id == id)
         .first()
     )
@@ -535,25 +534,29 @@ def delete_voter(g_id):
 @app.route("/api/v1.0/votes", methods=["POST"])
 @jwt_required()
 def submit_vote():
-    if "voter_id" in request.json and "candidate_id" in request.json:
+    if "voter_id" in request.json and "candidate_id" in request.json and "vote_type" in request.json:
         voter_id = request.json["voter_id"]
         candidate_id = request.json["candidate_id"]
+        vote_type = VoteType(request.json["vote_type"])
 
-        # Check if the user has already voted
-        existing_vote = session.query(Votes).filter_by(voter_id=voter_id).first()
-        if existing_vote:
-            return make_response(jsonify({"message": "User has already voted"}), 403)
+        # Check if the user has reached the maximum allowed votes for the given vote_type
+        existing_votes = session.query(Votes).filter_by(voter_id=voter_id, vote_type=vote_type.value).count()
+        max_votes = 2 if vote_type == VoteType.POSITIVE else 1
+        if existing_votes >= max_votes:
+            return make_response(jsonify({"message": f"User has already cast {max_votes} votes of type {vote_type.name}"}), 403)
 
-        # Check if the candidate exists
         candidate = session.query(Candidate).filter_by(candidate_id=candidate_id).first()
         if not candidate:
             return make_response(jsonify({"message": "Candidate not found"}), 404)
 
-        # Create a new Vote object and store it in the database
-        new_vote = Votes(voter_id=voter_id, candidate_id=candidate_id)
+        if vote_type.value < 0 and candidate.vote_count == 0:
+            return make_response(jsonify({"message": "Cannot submit a negative vote when the candidate has 0 votes"}),
+                                 400)
+
+        new_vote = Votes(voter_id=voter_id, candidate_id=candidate_id, vote_type=vote_type.value)
         session.add(new_vote)
 
-        candidate.vote_count = get_vote_count(candidate_id) if candidate.vote_count else 1
+        candidate.vote_count += vote_type.value
 
         session.commit()
 
@@ -582,6 +585,24 @@ def delete_vote(vote_id):
         return make_response(jsonify({"message": "Vote deleted", "vote_id": vote_id}), 200)
     else:
         return make_response(jsonify({"message": "Vote not found"}), 404)
+
+
+@app.route("/api/v1.0/remaining-votes/<voter_id>", methods=["GET"])
+@jwt_required()
+def get_remaining_votes(voter_id):
+    max_positive_votes = 2
+    max_negative_votes = 1
+
+    positive_votes = session.query(Votes).filter_by(voter_id=voter_id, vote_type=VoteType.POSITIVE.value).count()
+    negative_votes = session.query(Votes).filter_by(voter_id=voter_id, vote_type=VoteType.NEGATIVE.value).count()
+
+    remaining_positive_votes = max_positive_votes - positive_votes
+    remaining_negative_votes = max_negative_votes - negative_votes
+
+    return jsonify({
+        "remaining_positive_votes": remaining_positive_votes,
+        "remaining_negative_votes": remaining_negative_votes
+    })
 
 
 @app.route("/api/v1.0/votes", methods=["DELETE"])

@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine, Boolean
+from enum import Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, Session
 
@@ -50,6 +51,7 @@ class Verification(Base):
     email = Column(String, unique=True, nullable=False)
     otp = Column(String, unique=True, nullable=False)
 
+
 class Party(Base):
     __tablename__ = 'Party'
 
@@ -76,13 +78,18 @@ class Candidate(Base):
     votes = relationship("Votes", back_populates="candidate")
 
 
+class VoteType(Enum):
+    POSITIVE = 1
+    NEGATIVE = -1
+
+
 class Votes(Base):
     __tablename__ = 'Votes'
 
     vote_id = Column(Integer, primary_key=True)
     voter_id = Column(Integer, ForeignKey('Voter.voter_id'), nullable=False)
     candidate_id = Column(Integer, ForeignKey('Candidate.candidate_id'), nullable=False)
+    vote_type = Column(Integer, nullable=False)
 
-    # Relationships
     voter = relationship("Voter", back_populates="votes")
     candidate = relationship("Candidate", back_populates="votes")
