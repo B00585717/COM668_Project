@@ -10,7 +10,7 @@
       <div class="col-md-6" *ngFor="let candidate of candidate_list | async" style="margin-top: 50px">
         <div class="card" style="margin-right: 50px;">
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4" style="object-fit: cover;">
               <img src="{{ candidate.image }}" alt="Profile Picture" class="img-fluid" [routerLink]="['/candidates/'+ candidate.candidate_id]" style="cursor: pointer" >
               <p style="margin-left: 35px; cursor: pointer" [routerLink]="['/parties/'+ candidate.party_id]">{{ candidate.party_name }}</p>
             </div>

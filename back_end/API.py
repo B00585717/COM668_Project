@@ -23,6 +23,8 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 CORS(app)
 
 jwt = JWTManager(app)
+SQLdb = DBConfig()
+cursor = SQLdb.get_cursor()
 
 # Create a session factory
 Session = sessionmaker(bind=engine)
@@ -626,6 +628,7 @@ def fetch_voting_data():
         voting_data.append({
             "candidate_id": candidate.candidate_id,
             "candidate_name": f"{candidate.candidate_firstname} {candidate.candidate_lastname}",
+            "party_id": party.party_id,
             "party_name": party.party_name,
             "vote_count": candidate.vote_count,
             "candidate_image": candidate.image,
