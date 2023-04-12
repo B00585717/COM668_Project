@@ -12,7 +12,9 @@ export class Password_changeComponent {
   newPassword: any;
   email: any;
 
-  constructor(private webService: WebService, private authService: AuthService, private router: Router) {}
+  constructor(private webService: WebService,
+              private authService: AuthService,
+              private router: Router) {}
 
   updatePassword() {
     const g_id = this.authService.getGovId();

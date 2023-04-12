@@ -14,7 +14,8 @@ export class PartyComponent {
   party_list: any = [];
   party: any;
 
-   constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
+   constructor(public webService: WebService,
+               private route: ActivatedRoute) {
   }
 
   ngOnInit() {

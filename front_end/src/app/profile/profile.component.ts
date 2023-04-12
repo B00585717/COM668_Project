@@ -12,7 +12,8 @@ export class ProfileComponent implements OnInit {
   profile: any;
   isAdmin: boolean = false;
 
-  constructor(private webService: WebService, private authService: AuthService) {}
+  constructor(private webService: WebService,
+              private authService: AuthService) {}
 
   ngOnInit() {
     this.authService.isAdmin$.subscribe((isAdmin) => {

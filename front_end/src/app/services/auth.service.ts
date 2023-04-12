@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root',
@@ -10,16 +11,14 @@ export class AuthService {
   public isLoggedIn$ = this._isLoggedIn.asObservable();
 
   private _userData = new BehaviorSubject<any>(null);
-  public userData$ = this._userData.asObservable();
 
   private _isAdmin = new BehaviorSubject<boolean>(this.getIsAdmin());
   public isAdmin$ = this._isAdmin.asObservable();
 
-  private user: any;
   private voter_id: any;
   private gov_id: any;
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   isLoggedIn(): boolean {
     const token = localStorage.getItem('access_token');
@@ -27,13 +26,13 @@ export class AuthService {
     return !!token;
   }
 
+  getToken() {
+    return localStorage.getItem('access_token');
+  }
+
   setUser(userData: any) {
     this._userData.next(userData);
     this.setIsAdmin(userData.isAdmin);
-  }
-
-  getUser() {
-    return this._userData.getValue();
   }
 
   getGovId(): any {
@@ -65,7 +64,6 @@ export class AuthService {
     localStorage.setItem('voter_id', voter_id.toString());
   }
 
-  // Add a new method to get voter_id
   getVoterId(): number | null {
     const voterIdStr = localStorage.getItem('voter_id');
     if (voterIdStr) {
@@ -73,5 +71,10 @@ export class AuthService {
     } else {
       return null;
     }
+  }
+
+  resetElection() {
+    const headers = new HttpHeaders().set('Authorization', 'Bearer ' + this.getToken());
+    return this.http.delete('http://localhost:5000/api/v1.0/votes',{ headers });
   }
 }

@@ -1,7 +1,6 @@
 import {Component} from "@angular/core";
 import {WebService} from "../services/web.service";
 import {FormBuilder} from "@angular/forms";
-import {ActivatedRoute, Router} from "@angular/router";
 import {VoteService} from "../services/vote.service";
 import { AuthService } from '../services/auth.service';
 
@@ -19,8 +18,7 @@ export class CandidatesComponent {
   constructor(public webService: WebService,
               private formBuilder: FormBuilder,
               private voteService: VoteService,
-              private authService: AuthService,
-              private router: Router) {}
+              private authService: AuthService) {}
 
   ngOnInit() {
     this.candidate_list = this.webService.getCandidates();

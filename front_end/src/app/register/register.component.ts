@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
 import {FormBuilder, Validators} from "@angular/forms";
 import {WebService} from "../services/web.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {Router} from "@angular/router";
 import { HttpClient } from '@angular/common/http';
 import { EmailService } from '../services/email.service';
 
@@ -18,7 +18,11 @@ export class RegisterComponent {
   email: any;
   postcode_regex = '^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([AZa-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$'
 
-  constructor(public webService: WebService, private router: Router, private formBuilder: FormBuilder, private http: HttpClient, private emailService: EmailService) {
+  constructor(public webService: WebService,
+              private router: Router,
+              private formBuilder: FormBuilder,
+              private http: HttpClient,
+              private emailService: EmailService) {
   }
 
   ngOnInit() {

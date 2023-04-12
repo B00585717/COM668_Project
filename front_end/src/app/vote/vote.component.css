@@ -10,13 +10,26 @@
   font-size: 18px;
 }
 
-button {
+.button1 {
   border: none;
   outline: 0;
   display: inline-block;
   padding: 8px;
   color: white;
-  background-color: #000;
+  background-color: green;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+}
+
+.button2 {
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: red;
   text-align: center;
   cursor: pointer;
   width: 100%;

@@ -41,6 +41,14 @@ export class VotingDataComponent implements OnInit {
     });
   }
 
+  calculateVotePercentage(vote_count: number): number {
+  const totalVotes = this.votingData.reduce((total, candidate) => total + candidate.vote_count, 0);
+  return (vote_count / totalVotes) * 100;
+}
+  sortByVotePercentage(): void {
+    this.votingData.sort((a, b) => b.vote_percentage - a.vote_percentage);
+  }
+
   createPieChart(){
     const candidateNames = this.votingData.map(candidate => candidate.candidate_name);
     const colors = this.getColours(candidateNames.length);

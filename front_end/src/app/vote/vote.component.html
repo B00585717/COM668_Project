@@ -11,6 +11,10 @@
 </div>
   <div class="container" style="margin-top: 20px">
     <div class="row" *ngIf="voter_id; else elseBlock">
+      <div class="remaining-votes">
+<p>Remaining positive votes: {{ remaining_positive_votes }}</p>
+<p>Remaining negative votes: {{ remaining_negative_votes }}</p>
+</div>
       <div class="col-md-6" *ngFor="let candidate of candidate_list | async">
         <div class="card mb-3">
           <div class="row g-0">
@@ -19,7 +23,8 @@
               <h1>{{candidate.candidate_firstname}}</h1>
               <h1>{{candidate.candidate_lastname}}</h1>
               <p class="title">{{candidate.party_name}}</p>
-              <p><button *ngIf="voter_id" (click)="onVoteButtonClick(candidate.candidate_id)">Vote</button></p>
+              <p><button class="button1" (click)="onVoteButtonClick(1, candidate)">+</button>
+                <button class="button2" (click)="onVoteButtonClick(-1, candidate)">-</button></p>
             </div>
             </div>
           </div>

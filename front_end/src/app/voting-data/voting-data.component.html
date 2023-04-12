@@ -20,7 +20,7 @@
         <th>Candidate Name</th>
         <th>Party Name</th>
         <th>Vote Count</th>
-        <th>Vote Percentage</th>
+        <th>Vote Percentage <i class="fa fa-sort" aria-hidden="true" (click)="sortByVotePercentage()"></i></th>
       </tr>
     </thead>
     <tbody>
@@ -29,7 +29,7 @@
         <td>{{ item.candidate_name }}</td>
         <td>{{ item.party_name }}</td>
         <td>{{ item.vote_count }}</td>
-        <td>{{ item.vote_percentage | number:'1.1-1' }}%</td>
+        <td>{{ calculateVotePercentage(item.vote_count) | number:'1.1-1' }}%</td>
       </tr>
     </tbody>
   </table>

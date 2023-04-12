@@ -24,7 +24,11 @@ export class AdminComponent implements OnInit {
 
 
 
-  constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder, private voteService: VoteService, private authService: AuthService) {
+  constructor(public webService: WebService,
+              private route: ActivatedRoute,
+              private formBuilder: FormBuilder,
+              private voteService: VoteService,
+              private authService: AuthService) {
 
   }
   ngOnInit() {
@@ -145,6 +149,12 @@ export class AdminComponent implements OnInit {
         console.error('Error adding candidate', error);
       }
   );
+  }
+
+  resetElection(){
+    this.authService.resetElection().subscribe( response => {
+      console.log('Election Reset', response);
+    })
   }
 
 }

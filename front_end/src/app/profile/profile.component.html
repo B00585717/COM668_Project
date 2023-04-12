@@ -41,6 +41,7 @@
           <td></td>
           <td><button routerLink='/profile/{{profile.gov_id}}' class="btn btn-secondary">Change Password</button></td>
         </tr>
+        <button *ngIf="isAdmin" routerLink='/admin' class="btn btn-secondary">Admin</button>
         </tbody>
       </table>
     </div>

@@ -14,7 +14,9 @@ export class CandidateComponent {
   candidate: any;
 
 
-  constructor(public webService: WebService, private route: ActivatedRoute, private formBuilder: FormBuilder) {
+  constructor(public webService: WebService,
+              private route: ActivatedRoute,
+              private formBuilder: FormBuilder) {
   }
 
 ngOnInit() {

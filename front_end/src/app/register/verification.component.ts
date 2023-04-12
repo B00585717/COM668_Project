@@ -14,7 +14,10 @@ export class VerificationComponent {
   verificationForm: any;
   email_regex = '\\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\b'
 
-  constructor(private http: HttpClient, private router: Router, private formBuilder: FormBuilder, private emailService: EmailService) {}
+  constructor(private http: HttpClient,
+              private router: Router,
+              private formBuilder: FormBuilder,
+              private emailService: EmailService) {}
 
   ngOnInit(){
     this.verificationForm = this.formBuilder.group({

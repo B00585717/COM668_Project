@@ -16,22 +16,45 @@ export class VoteComponent {
   candidate_list: any = [];
   voter_id: any;
 
+  remaining_positive_votes: any;
+  remaining_negative_votes: any;
+
   constructor(public webService: WebService,
               private formBuilder: FormBuilder,
               private voteService: VoteService,
               private authService: AuthService,
               private router: Router) {}
 
-  onVoteButtonClick(candidate_id: number) {
-    console.log('Voter ID:', this.voter_id);
-    console.log('Candidate ID:', candidate_id);
-    this.voteService.voteForCandidate(this.voter_id, candidate_id).subscribe(
-      response => {console.log('Vote submitted', response)
-      this.router.navigate(['/voting-data']);
-        },
-      error => console.error('Error submitting vote', error)
-    );
+submitVote(vote_type: number, candidate: any) {
+  this.voteService.voteForCandidate(this.voter_id, candidate.candidate_id, vote_type).subscribe(
+    response => {
+      console.log('Vote submitted', response);
+      this.updateRemainingVotes();
+      this.voteService.getRemainingVotes(this.voter_id).subscribe(remainingVotes => {
+        console.log('Remaining Votes:', remainingVotes);
+        if (remainingVotes.remaining_positive_votes === 0 && remainingVotes.remaining_negative_votes === 0) {
+          this.router.navigate(['/voting-data']);
+        }
+      });
+
+    },
+    error => console.error('Error submitting vote', error)
+  );
+}
+
+  onVoteButtonClick(vote_type: number, candidate: any) {
+    this.submitVote(vote_type, candidate);
   }
+
+  getRemainingVotes() {
+  this.voteService.getRemainingVotes(this.voter_id).subscribe(
+    (response: any) => {
+      this.remaining_positive_votes = response.remaining_positive_votes;
+      this.remaining_negative_votes = response.remaining_negative_votes;
+    },
+    error => console.error('Error retrieving remaining votes', error)
+  );
+}
 
   ngOnInit() {
     this.candidate_list = this.webService.getCandidates();
@@ -41,9 +64,19 @@ export class VoteComponent {
       console.log('Voter ID:', this.authService.getVoterId());
       if (isLoggedIn) {
         this.voter_id = this.authService.getVoterId()
+        this.updateRemainingVotes();
       } else {
         this.voter_id = null;
       }
     });
   }
+
+    updateRemainingVotes() {
+    this.voteService.getRemainingVotes(this.voter_id).subscribe(response => {
+      this.remaining_positive_votes = response.remaining_positive_votes;
+      this.remaining_negative_votes = response.remaining_negative_votes;
+    });
+  }
 }
+
+
