@@ -137,7 +137,7 @@ export class VotingDataComponent implements OnInit {
     });
   }
   getColours(count: number) {
-    return ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'black', 'lilac', 'gold'];
+    return ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'lilac', 'gold'];
 }
 
 }
