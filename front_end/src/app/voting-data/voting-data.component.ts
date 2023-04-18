@@ -23,6 +23,8 @@ export class VotingDataComponent implements OnInit {
       this.createPieChart()
       this.createBarChart()
 
+      const totalVotes = this.votingData.reduce((total, candidate) => total + candidate.vote_count, 0);
+
       this.groupedData = this.votingData.reduce((accumulator, current) => {
       const existingParty = accumulator.find((party: { party_name: any; }) => party.party_name === current.party_name);
 
@@ -30,11 +32,22 @@ export class VotingDataComponent implements OnInit {
         existingParty.vote_count += current.vote_count;
         existingParty.vote_percentage += current.vote_percentage;
       } else {
-        accumulator.push(current);
+        // Create a new object for the party with updated vote_count
+        accumulator.push({
+          candidate_name: current.candidate_name,
+          candidate_image: current.candidate_image,
+          party_name: current.party_name,
+          vote_count: current.vote_count,
+        });
       }
 
       return accumulator;
     }, []);
+
+    // Calculate vote_percentage for each party in groupedData
+    this.groupedData.forEach((party: { vote_count: number; vote_percentage: number; }) => {
+      party.vote_percentage = (party.vote_count / totalVotes) * 100;
+    });
 
       this.createPartyBarChart()
       this.createPartyPieChart()

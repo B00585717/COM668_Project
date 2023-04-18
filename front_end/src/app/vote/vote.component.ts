@@ -46,16 +46,6 @@ submitVote(vote_type: number, candidate: any) {
     this.submitVote(vote_type, candidate);
   }
 
-  getRemainingVotes() {
-  this.voteService.getRemainingVotes(this.voter_id).subscribe(
-    (response: any) => {
-      this.remaining_positive_votes = response.remaining_positive_votes;
-      this.remaining_negative_votes = response.remaining_negative_votes;
-    },
-    error => console.error('Error retrieving remaining votes', error)
-  );
-}
-
   ngOnInit() {
     this.candidate_list = this.webService.getCandidates();
 
