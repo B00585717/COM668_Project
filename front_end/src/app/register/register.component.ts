@@ -51,7 +51,7 @@ export class RegisterComponent {
     this.webService.addVoter(this.registrationForm.value).subscribe(
       (response) => {
         console.log("Success:", response); // Add this line to log the successful response
-      this.router.navigateByUrl('/login');
+      this.router.navigate(['/login']);
     },
       (error) => {
         console.error('onSubmitError:', error);

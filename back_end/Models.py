@@ -11,9 +11,6 @@ engine = create_engine(DBConfig().get_conn_string())
 # Create a base class for the model
 Base = declarative_base()
 
-# Create the tables if they don't exist
-Base.metadata.create_all(engine)
-
 
 class Voter(Base):
     __tablename__ = 'Voter'
@@ -28,13 +25,6 @@ class Voter(Base):
     isAdmin = Column(Boolean, default=False)
 
     votes = relationship("Votes", back_populates="voter")
-
-    def get_password(self):
-        return self.password
-
-    @classmethod
-    def get_gov_id(cls, gov_id: int, session: Session):
-        return session.query(cls).filter_by(gov_id=gov_id).first()
 
 
 class Constituency(Base):
@@ -70,7 +60,7 @@ class Candidate(Base):
     party_id = Column(Integer, ForeignKey('Party.party_id'), nullable=False)
     vote_count = Column(Integer, unique=False, nullable=True)
     image = Column(String, unique=False, nullable=False)
-    constituency_id = Column(Integer, ForeignKey('Constituency.constituency_id'), nullable=True)
+    constituency_id = Column(Integer, ForeignKey('Constituency.constituency_id'), nullable=False)
     statement = Column(String, unique=False, nullable=False)
 
     party = relationship("Party")

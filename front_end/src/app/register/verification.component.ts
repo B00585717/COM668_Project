@@ -24,18 +24,18 @@ export class VerificationComponent {
       email: ['', Validators.pattern(this.email_regex)],
   });
   }
-sendOtp() {
-  this.email = this.verificationForm.get('email').value; // Add this line to get the email value
-  this.http
-      .post('http://localhost:5000/api/v1.0/verification', { email: this.email })
-      .subscribe(
-        () => {
-          this.emailService.setEmail(this.email);
-          this.router.navigate(['/register']);
-        },
-        (error) => {
-          console.error('Error sending OTP:', error);
-        }
-  );
-}
+  sendOtp() {
+    this.email = this.verificationForm.get('email').value; // Add this line to get the email value
+    this.http
+        .post('http://localhost:5000/api/v1.0/verification', { email: this.email })
+        .subscribe(
+          () => {
+            this.emailService.setEmail(this.email);
+            this.router.navigate(['/register']);
+          },
+          (error) => {
+            console.error('Error sending OTP:', error);
+          }
+    );
+  }
 }
