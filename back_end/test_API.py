@@ -4,13 +4,13 @@ from unittest.mock import MagicMock
 import bcrypt
 
 import API
-from API import encrypt_password, gov_id_generator, match_postcode_with_constituency, generate_otp, validate_email, \
+from Helpers import encrypt_password, gov_id_generator, match_postcode_with_constituency, generate_otp, validate_email, \
     validate_postcode, verify_otp, user_exists, get_user_by_gov_id, get_user_by_email, check_password
 
 
 class TestApp(unittest.TestCase):
-
     postcode_regex = API.postcode_regex
+    session = API.Session()
 
     def test_encrypt_password(self):
         password = "test_password"
@@ -86,7 +86,7 @@ class TestApp(unittest.TestCase):
         mock_query.filter_by.return_value.first.return_value = {'email': 'johnsmith@example.com', 'otp': '123456'}
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = verify_otp('', '123456')
+            result = verify_otp('', '123456', session=API.session)
             self.assertTrue(result)
 
     def test_verify_otp_invalid(self):
@@ -94,7 +94,7 @@ class TestApp(unittest.TestCase):
         mock_query.filter_by.return_value.first.return_value = None
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = verify_otp('johnsmith@example.com', '000000')
+            result = verify_otp('johnsmith@example.com', '000000', session=API.session)
             self.assertFalse(result)
 
     def test_user_exists_true(self):
@@ -102,7 +102,7 @@ class TestApp(unittest.TestCase):
         mock_query.filter_by.return_value.first.return_value = {'email': 'johnsmith@example.com'}
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = user_exists('johnsmith@example.com')
+            result = user_exists('johnsmith@example.com', session=API.session)
             self.assertTrue(result)
 
     def test_user_exists_false(self):
@@ -110,7 +110,7 @@ class TestApp(unittest.TestCase):
         mock_query.filter_by.return_value.first.return_value = None
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = user_exists('notfound@example.com')
+            result = user_exists('notfound@example.com', session=API.session)
             self.assertFalse(result)
 
     def test_get_user_by_gov_id_found(self):
@@ -118,7 +118,7 @@ class TestApp(unittest.TestCase):
         mock_query.filter_by.return_value.first.return_value = {'gov_id': '123456'}
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = get_user_by_gov_id('123456')
+            result = get_user_by_gov_id('123456', session=API.session)
             self.assertEqual(result, {'gov_id': '123456'})
 
     def test_get_user_by_gov_id_not_found(self):
@@ -126,16 +126,15 @@ class TestApp(unittest.TestCase):
         mock_query.filter_by.return_value.first.return_value = None
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = get_user_by_gov_id('NOTNUMBER')
+            result = get_user_by_gov_id('NOTNUMBER', session=API.session)
             self.assertIsNone(result)
-
 
     def test_get_user_by_email_found(self):
         mock_query = MagicMock()
         mock_query.filter_by.return_value.first.return_value = {'email': 'johnsmith@example.com'}
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = get_user_by_email('johnsmith@example.com')
+            result = get_user_by_email('johnsmith@example.com', session=API.session)
             self.assertEqual(result, {'email': 'johnsmith@example.com'})
 
     def test_get_user_by_email_not_found(self):
@@ -143,7 +142,7 @@ class TestApp(unittest.TestCase):
         mock_query.filter_by.return_value.first.return_value = None
 
         with unittest.mock.patch('API.session.query', return_value=mock_query):
-            result = get_user_by_email('johnsmith@example.com')
+            result = get_user_by_email('johnsmith@example.com', session=API.session)
             self.assertIsNone(result)
 
     def test_check_password_correct(self):

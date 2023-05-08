@@ -9,12 +9,14 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_cors import CORS
 from Models import Voter, Verification, Party, Candidate, engine, Constituency, Votes, VoteType
 from sqlalchemy import func
-
+from flask_talisman import Talisman
 from back_end import Helpers
 
 app = Flask(__name__)
+talisman = Talisman(app)
+
 app.secret_key = config('SK')
-app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
+app.config['JWT_SECRET_KEY'] = config('SK')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 CORS(app)
@@ -113,10 +115,7 @@ def verification():
             return make_response(jsonify({"message": "User already exists!"}), 403)
 
         # Generate a random 6-digit OTP
-        # OTP = generate_otp()
-
-        # TODO: This is just for testing, the application will use randomly generated otp's
-        OTP = '123456'
+        OTP = Helpers.generate_otp()
 
         # Use GoogleAPI to send email containing otp
         Helpers.send_otp(email, OTP)
@@ -150,7 +149,10 @@ def login():
     # Check if the user was found in the database
     if user:
         if Helpers.check_password(password, Helpers.get_password(user.gov_id, session)):
-            access_token = create_access_token(identity=gov_id)
+
+            # Set gov_id as token identity
+            access_token = create_access_token(identity=gov_id,
+                                               expires_delta=timedelta(minutes=10))
 
             user_data = {
                 'voter_id': user.voter_id,
@@ -305,12 +307,12 @@ def delete_party(id):
     party = session.query(Party).filter_by(party_id=id).first()
 
     if not party:
-        return make_response(jsonify({'message': 'Party not found'}), 404)
+        return make_response(jsonify('Party not found'), 404)
 
     session.delete(party)
     session.commit()
 
-    return make_response(jsonify({'message': 'Party deleted'}), 200)
+    return make_response(jsonify('Party deleted'), 200)
 
 
 @app.route("/api/v1.0/candidates", methods=["GET"])
@@ -451,12 +453,12 @@ def delete_candidate(id):
     candidate = session.query(Candidate).filter_by(candidate_id=id).first()
 
     if not candidate:
-        return make_response(jsonify({'message': 'Candidate not found'}), 404)
+        return make_response(jsonify('Candidate not found'), 404)
 
     session.delete(candidate)
     session.commit()
 
-    return make_response(jsonify({'message': 'Candidate deleted'}), 200)
+    return make_response(jsonify('Candidate deleted'), 200)
 
 
 @app.route("/api/v1.0/voters", methods=["GET"])
@@ -533,16 +535,16 @@ def submit_vote():
         # Check if the user has reached the maximum allowed votes for the given vote_type
         existing_votes = session.query(Votes).filter_by(voter_id=voter_id, vote_type=vote_type.value).count()
         if vote_type == VoteType.POSITIVE:
-            max_votes = max_positive_votes
+            max_votes = max_positive_votes  # = 2
         else:
-            max_votes = 1
+            max_votes = 1  # if vote_type is not positive it is negative
         if existing_votes >= max_votes:
             return make_response(
                 jsonify({"message": f"User has already cast {max_votes} votes of type {vote_type.name}"}), 403)
 
         candidate = session.query(Candidate).filter_by(candidate_id=candidate_id).first()
         if not candidate:
-            return make_response(jsonify({"message": "Candidate not found"}), 404)
+            return make_response(jsonify("Candidate not found"), 404)
 
         new_vote = Votes(voter_id=voter_id, candidate_id=candidate_id, vote_type=vote_type.value)
         session.add(new_vote)
@@ -555,7 +557,6 @@ def submit_vote():
 
         return make_response(jsonify({"message": "Vote submitted", "vote_id": new_vote.vote_id}), 201)
     else:
-        print("Invalid request:", request.json)
         return make_response(jsonify({"message": "Invalid request"}), 400)
 
 

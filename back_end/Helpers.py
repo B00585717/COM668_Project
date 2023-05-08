@@ -12,6 +12,7 @@ OTP_RANGE_MIN = 100000
 OTP_RANGE_MAX = 999999
 
 
+# Encrypt password using bcrypt
 def encrypt_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
